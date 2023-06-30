@@ -1,0 +1,6 @@
+include/mmtisobmff/version.h
+*.pyc
+test_package/build/
+.DS_Store
+.vscode
+build/

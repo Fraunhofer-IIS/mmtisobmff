@@ -1,0 +1,7 @@
+- [Bernd Czelhan](https://github.com/bczelhan-iis), Fraunhofer IIS
+- [Bernd Herrmann](https://github.com/bherrmann-iis), Fraunhofer IIS
+- Daniel Stadelmann, Fraunhofer IIS
+- Jochen Issing, Fraunhofer IIS
+- Julian Zebelein, Fraunhofer IIS
+- [Moritz Fuchs](https://github.com/mfuchs-iis), Fraunhofer IIS
+- Ziad Shaban, Fraunhofer IIS
