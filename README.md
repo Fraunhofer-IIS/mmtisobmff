@@ -2,7 +2,7 @@
 
 mmtisobmff is an ISOBMFF reader and writer library with MPEG-H 3D Audio support.
 
-For documentation and usage, please have a look at the [Wiki](https://github.com/Fraunhofer-IIS/mmtisobmff/-/wikis/home).
+For documentation and usage, please have a look at the [Wiki](https://github.com/Fraunhofer-IIS/mmtisobmff/wiki/home).
 
 ## Supported architectures
 
@@ -114,7 +114,7 @@ The following project-specific CMake parameters are available:
 
 ### How to build using CMake
 
-Find below the basic instructions to build the project or visit the ["Wiki Build"](https://github.com/Fraunhofer-IIS/mmtisobmff/-/wikis/Build) page(s) to get further information (additional build parameters and platform specific build instructions).
+Find below the basic instructions to build the project or visit the ["Wiki Build"](https://github.com/Fraunhofer-IIS/mmtisobmff/wiki/Build) page(s) to get further information (additional build parameters and platform specific build instructions).
 
 1. Clone the project and make a build folder.
    ```
