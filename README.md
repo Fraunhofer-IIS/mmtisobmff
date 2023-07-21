@@ -118,7 +118,7 @@ Find below the basic instructions to build the project or visit the ["Wiki Build
 
 1. Clone the project and make a build folder.
    ```
-   $ git clone git@github.com:Fraunhofer-IIS/mmtisobmff.git
+   $ git clone https://github.com/Fraunhofer-IIS/mmtisobmff.git
    $ mkdir -p build
    ```
 2. Configure the project using CMake.

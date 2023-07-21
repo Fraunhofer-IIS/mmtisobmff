@@ -5,7 +5,7 @@ project(mmtisobmff VERSION 1.0.0)
 
 FetchContent_Declare(
   ilo
-  GIT_REPOSITORY git@github.com:Fraunhofer-IIS/ilo.git
+  GIT_REPOSITORY https://github.com/Fraunhofer-IIS/ilo.git
   GIT_TAG        r1.0.0
 )
 
