@@ -103,7 +103,9 @@ namespace isobmff {
 namespace box {
 
 static void assertAssetIdScheme(ilo::Fourcc assetIdScheme) {
-  ILO_LOG_SCOPE("%s", ilo::toString(assetIdScheme).c_str());
+  if (verboseLogLevel) {
+    ILO_LOG_SCOPE("%s", ilo::toString(assetIdScheme).c_str());
+  }
 
   // To check: this might have to be updated because last version of ISO/IEC 23008-1 has different
   // asset_id_scheme 0x00000000 UUID (universally unique identifier) 0x00000001 URI (uniform

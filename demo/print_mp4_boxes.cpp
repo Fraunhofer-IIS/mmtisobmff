@@ -1407,6 +1407,7 @@ void doWork(int argc, char** argv) {
   if (!logging) {
     disableLogging();
   } else {
+    setLogLevel(LogLevel::verbose);
     redirectLoggingToFile("mmtisobmff_print_mp4_boxes.log", RedirectMode::overwrite);
   }
 

@@ -354,6 +354,17 @@ ESapType convertSapTypeFromUint8ToESapType(uint8_t sapType) {
   }
 }
 
+LogLevel convertLogLevelCEnum(LogLevel_C logLevel) {
+  switch (logLevel) {
+    case LogLevel_C::LogLevelStandard:
+      return LogLevel::standard;
+    case LogLevel_C::LogLevelVerbose:
+      return LogLevel::verbose;
+    default:
+      throw std::invalid_argument("Invalid log level given.");
+  }
+}
+
 void fillIsobmffReadInstance(ISOBMFF_Reader** isobmff) {
   (*isobmff)->movieInfo = (*isobmff)->isobmffReader->movieInfo();
   (*isobmff)->drcInfo = (*isobmff)->isobmffReader->specificBoxInfo<SDrcInfo>();
@@ -433,6 +444,16 @@ ISOBMFF_ERR isobmff_disableLogging() {
     disableLogging();
   } catch (const std::exception& e) {
     ILO_LOG_ERROR("Disabling the logging system failed %s", e.what());
+    return ISOBMFF_LIB_ERR;
+  }
+  return ISOBMFF_OK;
+}
+
+ISOBMFF_ERR isobmff_setLogLevel(const LogLevel_C logLevel) {
+  try {
+    setLogLevel(convertLogLevelCEnum(logLevel));
+  } catch (const std::exception& e) {
+    ILO_LOG_ERROR("Setting the log level failed %s", e.what());
     return ISOBMFF_LIB_ERR;
   }
   return ISOBMFF_OK;
