@@ -719,7 +719,9 @@ void CVvcDecoderConfigRecord::writeConstraintInfo(ilo::CBitBuffer& bitWriter,
   }
 
   if (lefOverBits) {
-    bitWriter.write(m_ptl.nativePtl.generalConstraintInfo.back() >> (8 - lefOverBits), lefOverBits);
+    bitWriter.write(
+        static_cast<uint8_t>(m_ptl.nativePtl.generalConstraintInfo.back() >> (8U - lefOverBits)),
+        lefOverBits);
   }
 
   // Since we might have changed the original byte-alignment of the general_constraints_info()

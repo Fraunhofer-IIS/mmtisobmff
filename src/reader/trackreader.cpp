@@ -126,11 +126,11 @@ struct CGenericTrackReader::Pimpl {
 };
 
 static std::shared_ptr<box::CBox> getSampleEntry(const BoxElement& currentTrackElement) {
-  const BoxElement& stsdElement = findFirstElementWithFourccAndBoxType<box::CSampleDescriptionBox>(
-                                      currentTrackElement, ilo::toFcc("stsd"))
-                                      .get();
-  ILO_ASSERT(stsdElement.childCount() == 1, "Only a single sample entry is supported");
-  return std::dynamic_pointer_cast<box::CBox>(stsdElement[0].item);
+  std::reference_wrapper<const BoxElement> stsdElement =
+      findFirstElementWithFourccAndBoxType<box::CSampleDescriptionBox>(currentTrackElement,
+                                                                       ilo::toFcc("stsd"));
+  ILO_ASSERT(stsdElement.get().childCount() == 1, "Only a single sample entry is supported");
+  return std::dynamic_pointer_cast<box::CBox>(stsdElement.get()[0].item);
 }
 
 const BoxElement& getCurrentTrackElement(const BoxTree& tree, size_t tracknumber) {
