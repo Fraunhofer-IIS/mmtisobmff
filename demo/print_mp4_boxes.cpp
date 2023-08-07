@@ -152,6 +152,7 @@ amm-info@iis.fraunhofer.de
 #include "box/elstbox.h"
 #include "box/mhapbox.h"
 #include "box/btrtbox.h"
+#include "box/sidxbox.h"
 #include "mmtisobmff/reader/input.h"
 
 using namespace ilo;
@@ -469,7 +470,7 @@ struct BoxPrinter {
                   << ")" << std::endl;
       }
 
-      std::cout << treeSpaces << "-- Trun Entry Count          : " << box->trunEntries().size()
+      std::cout << treeSpaces << "-- Trun Entry Count        : " << box->trunEntries().size()
                 << std::endl;
 
       for (size_t i = 0; i < box->trunEntries().size() && i < maxEntryPrintNr; ++i) {
@@ -1382,6 +1383,46 @@ struct BoxPrinter {
       std::cout << treeSpaces << "-- Max Bitrate     : " << box->maxBitrate() << std::endl;
       std::cout << treeSpaces << "-- Average Bitrate : " << box->avgBitrate() << std::endl;
       return;
+    };
+
+    printMap[(toFcc("sidx"))] = [&](const BoxItem& item, const std::string& treeSpaces) {
+      auto box = std::dynamic_pointer_cast<CSegmentIndexBox>(item);
+
+      std::cout << treeSpaces
+                << "-- BoxVersion                  : " << std::to_string(box->version())
+                << std::endl;
+      std::cout << treeSpaces << "-- BoxFlags                    : " << box->flags() << std::endl;
+      std::cout << treeSpaces << "-- Reference Id                : " << box->referenceId()
+                << std::endl;
+      std::cout << treeSpaces << "-- Timescale                   : " << box->timescale()
+                << std::endl;
+      std::cout << treeSpaces
+                << "-- Earliest Presentation Time  : " << box->earliestPresentationTime()
+                << std::endl;
+      std::cout << treeSpaces << "-- First Offset                : " << box->firstOffset()
+                << std::endl;
+      std::cout << treeSpaces << "-- Reference Count             : " << box->referenceCount()
+                << std::endl;
+
+      const auto& refs = box->references();
+
+      for (size_t i = 0; i < refs.size(); ++i) {
+        std::cout << treeSpaces << "  -- Reference[" << i + 1 << "/" << refs.size() << "]"
+                  << std::endl;
+        std::cout << treeSpaces << "    -- Reference Type          : " << refs[i].referenceType
+                  << std::endl;
+        std::cout << treeSpaces << "    -- Reference Size          : " << refs[i].referenceSize
+                  << std::endl;
+        std::cout << treeSpaces << "    -- Subsegment Duration     : " << refs[i].subsegmentDuration
+                  << std::endl;
+        std::cout << treeSpaces << "    -- Starts With Sap         : " << refs[i].startsWithSap
+                  << std::endl;
+        std::cout << treeSpaces
+                  << "    -- SapType                 : " << std::to_string(refs[i].sapType)
+                  << std::endl;
+        std::cout << treeSpaces << "    -- Sap Delta Time          : " << refs[i].sapDeltaTime
+                  << std::endl;
+      }
     };
   }
 
