@@ -493,7 +493,7 @@ void CVvcDecoderConfigRecord::parse(ilo::ByteBuffer::const_iterator& begin,
     if (std::find(ALLOWED_VVC_NALU_TYPES.begin(), ALLOWED_VVC_NALU_TYPES.end(), array.naluType) ==
         ALLOWED_VVC_NALU_TYPES.end()) {
       ILO_LOG_WARNING(
-          "Potential unallowed non-VCL nalu type of %d found in vvc decoder config record.",
+          "Potentially forbidden non-VCL NALU type of %d found in VVC decoder config record.",
           array.naluType);
     }
 

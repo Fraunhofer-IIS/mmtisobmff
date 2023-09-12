@@ -451,7 +451,7 @@ ISOBMFF_ERR isobmff_setLogLevel(const LogLevel_C logLevel) {
   try {
     setLogLevel(convertLogLevelCEnum(logLevel));
   } catch (const std::exception& e) {
-    ILO_LOG_ERROR("Setting the log level failed %s", e.what());
+    ILO_LOG_ERROR("Setting the log level failed: %s", e.what());
     return ISOBMFF_LIB_ERR;
   }
   return ISOBMFF_OK;
