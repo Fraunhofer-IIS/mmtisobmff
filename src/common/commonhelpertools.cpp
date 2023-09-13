@@ -310,6 +310,8 @@ void copyMpegh(CIsobmffReader& reader, CIsobmffWriter& writer, const SCopyConfig
   fillAudioConfig(mpeghTrackConfig, config);
   mpeghTrackConfig.sampleRate = mpeghTrackReader->sampleRate();
   mpeghTrackConfig.configRecord = mpeghTrackReader->mhaDecoderConfigRecord();
+  mpeghTrackConfig.profileAndLevelCompatibleSets =
+      mpeghTrackReader->profileAndLevelCompatibleSets();
 
   auto mpeghTrackWriter = writer.trackWriter<CMpeghTrackWriter>(mpeghTrackConfig);
 
