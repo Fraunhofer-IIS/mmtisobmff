@@ -230,7 +230,7 @@ struct BoxPrinter {
       std::cout << treeSpaces << "-- MPU Sequence Number : " << box->mpuSequenceNumber()
                 << std::endl;
       std::cout << treeSpaces
-                << "-- Asset ID Scheme     : " << toString(box->assetIdentifierBox().assetIdScheme)
+                << "-- Asset ID Scheme     : " << box->assetIdentifierBox().assetIdScheme
                 << std::endl;
       std::cout << treeSpaces
                 << "-- Asset ID Length     : " << box->assetIdentifierBox().assetIdLength
