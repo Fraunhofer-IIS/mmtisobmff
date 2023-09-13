@@ -145,11 +145,11 @@ endif()
 
 if(mmtisobmff_BUILD_TEST)
   
-  list(APPEND testfilesAudio ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/german_forest_3s_snippet_mp4a_regular.mp4)
-  list(APPEND testfilesAudio ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/german_forest_2s_snippet_mha_regular.mp4)
-  list(APPEND testfilesAudio ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/german_forest_3s_snippet_mhm_regular.mp4)
-  list(APPEND testfilesAudio ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/german_forest_3s_snippet_mp4a.mp4)
-  list(APPEND testfilesAudio ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/german_forest_2s_snipet_mha.mp4)
+  list(APPEND testfilesAudio ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/audio_only_3s_m4a_xheaac_flat.mp4)
+  list(APPEND testfilesAudio ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/audio_only_3s_mha1_flat.mp4)
+  list(APPEND testfilesAudio ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/audio_only_3s_mhm1_flat.mp4)
+  list(APPEND testfilesAudio ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/audio_only_3s_m4a_xheaac_frag.mp4)
+  list(APPEND testfilesAudio ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/audio_only_3s_mha1_frag.mp4)
   
   foreach(testfile ${testfilesAudio})
     get_filename_component(testfile_name ${testfile} NAME)
@@ -159,16 +159,16 @@ if(mmtisobmff_BUILD_TEST)
     add_test(demo_simpleFileReader_c.${testfile_name} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/simpleFileReader_c ${testfile})
   endforeach()
 
-  get_filename_component(testfile_name ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/forest_short_av.mp4 NAME)
+  get_filename_component(testfile_name ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/av_3s_mha1_mhm1_avc1_flat.mp4 NAME)
   add_test(simpleFileWriter.${testfile_name}        
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/simpleFileWriter
-    ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/forest_short_av.mp4     
+    ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/av_3s_mha1_mhm1_avc1_flat.mp4
     ${CMAKE_CURRENT_BINARY_DIR}/../Testing/simpleFileWriter.${testfile_name}_out.mp4)
 
-  list(APPEND testfilesVideo ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/german_forest_2s_snippet_avc1_regular.mp4)
-  list(APPEND testfilesVideo ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/german_forest_2s_snippet_hvc1_regular.mp4)
-  list(APPEND testfilesVideo ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/german_forest_2s_snipet_avc1.mp4)
-  list(APPEND testfilesVideo ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/german_forest_2s_snipet_hvc1.mp4)
+  list(APPEND testfilesVideo ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/video_only_3s_avc1_flat.mp4)
+  list(APPEND testfilesVideo ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/video_only_3s_hvc1_flat.mp4)
+  list(APPEND testfilesVideo ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/video_only_3s_avc1_frag.mp4)
+  list(APPEND testfilesVideo ${CMAKE_CURRENT_SOURCE_DIR}/../test/data/video_only_3s_hvc1_frag.mp4)
 
   foreach(testfile ${testfilesVideo})
     get_filename_component(testfile_name ${testfile} NAME)
