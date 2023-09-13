@@ -153,6 +153,7 @@ amm-info@iis.fraunhofer.de
 #include "box/mhapbox.h"
 #include "box/btrtbox.h"
 #include "box/sidxbox.h"
+#include "box/co64box.h"
 #include "mmtisobmff/reader/input.h"
 
 using namespace ilo;
@@ -1422,6 +1423,26 @@ struct BoxPrinter {
                   << std::endl;
         std::cout << treeSpaces << "    -- Sap Delta Time          : " << refs[i].sapDeltaTime
                   << std::endl;
+      }
+    };
+
+    printMap[(toFcc("co64"))] = [&](const BoxItem& item, const std::string& treeSpaces) {
+      auto box = std::dynamic_pointer_cast<CChunkOffset64Box>(item);
+
+      std::cout << treeSpaces << "-- Box Version        : " << static_cast<uint32_t>(box->version())
+                << std::endl;
+      std::cout << treeSpaces << "-- Box Flags          : " << box->flags() << std::endl;
+      std::cout << treeSpaces << "-- Chunk Offset Count : " << box->chunkOffsets().size()
+                << std::endl;
+
+      for (size_t i = 0; i < box->chunkOffsets().size() && i < maxEntryPrintNr; ++i) {
+        std::cout << treeSpaces << "-- Chunk Offset       : " << box->chunkOffsets()[i]
+                  << std::endl;
+      }
+
+      if (maxEntryPrintNr < box->chunkOffsets().size()) {
+        std::cout << treeSpaces << "-- Chunk Offset       : ... "
+                  << box->chunkOffsets().size() - maxEntryPrintNr << " more" << std::endl;
       }
     };
   }
