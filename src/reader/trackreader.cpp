@@ -250,7 +250,7 @@ CGenericVideoTrackReader::CGenericVideoTrackReader(
   auto visualSampleEntry =
       std::dynamic_pointer_cast<box::CVisualSampleEntry>(p->m_genericSampleEntry);
   ILO_ASSERT(visualSampleEntry != nullptr,
-             "Generic video track reader could not access video sample entry!");
+             "Generic video track reader could not access visual sample entry!");
 
   pv = std::unique_ptr<CGenericVideoTrackReader::PimplVideo>(
       new CGenericVideoTrackReader::PimplVideo(visualSampleEntry));
