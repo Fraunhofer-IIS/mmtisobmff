@@ -182,7 +182,10 @@ CMovieInfo CIsobmffReader::movieInfo() const {
   result.majorBrand = ftype->majorBrand();
   result.compatibleBrands = ftype->compatibleBrands();
 
-  CUserDataExtractor::store<CMovieInfo>(p->tree()[1], result);
+  auto moov =
+      findFirstElementWithFourccAndBoxType<box::CContainerBox>(p->tree(), ilo::toFcc("moov"));
+
+  CUserDataExtractor::store<CMovieInfo>(moov, result);
 
   return result;
 }
