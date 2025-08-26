@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.16.0 )
 include(FetchContent)
 
-project(mmtisobmff VERSION 1.0.0)
+project(mmtisobmff VERSION 1.0.1)
 
 FetchContent_Declare(
   ilo
@@ -46,3 +46,5 @@ endif()
 if(${PROJECT_NAME}_BUILD_DOC)
   add_subdirectory(doc)
 endif()
+
+
