@@ -99,13 +99,17 @@ The following project-specific CMake parameters are available:
 </tr>
 <tr>
 <td><code>mmtisobmff_BUILD_DOC</code></td>
-<td>Enable / Disable documentation generation (requires a working [Doxygen](https://www.doxygen.nl/) installation).</td>
+<td>
+
+Enable / Disable documentation generation (requires a working [Doxygen](https://www.doxygen.nl/) installation).
+
+</td>
 </tr>
 </table>
 
 ### How to build using CMake
 
-Find below the basic instructions to build the project or visit the ["Wiki Build"](https://github.com/Fraunhofer-IIS/mmtisobmff/wiki/Build) page(s) to get further information (additional build parameters and platform specific build instructions).
+Find below the basic instructions to build the project or visit the ["Wiki Build"](https://github.com/Fraunhofer-IIS/mmtisobmff/wiki/Build-instructions) page(s) to get further information (additional build parameters and platform specific build instructions).
 
 1. Clone the project and make a build folder.
    ```
@@ -114,21 +118,22 @@ Find below the basic instructions to build the project or visit the ["Wiki Build
    ```
 2. Configure the project using CMake.
    ```
-   $ cmake -S mmtisobmff -B build
+   $ cmake -S mmtisobmff -B build -DCMAKE_BUILD_TYPE=Release
    ```
 3. Build the project.
    ```
-   $ cmake --build build
+   $ cmake --build build --config Release
    ```
 
 ## Contributing
 
 Contributions may be done through a pull request to the upstream repository.
 
-- Create a fork based on the latest master branch
-- Apply changes to the fork
-- Add the author names to [AUTHORS.md](./AUTHORS.md)
-- Create a pull request to the upstream repository. The request must contain a detailed description of its purpose
+- Create a fork based on the latest master branch.
+- Apply changes to the fork.
+- Add the author names to [AUTHORS.md](./AUTHORS.md).
+- Create a pull request to the upstream repository. The request must contain a detailed description of its purpose.
+
 
 ## Links
 
@@ -142,3 +147,4 @@ Please see the [LICENSE.txt](./LICENSE.txt) file for the terms of use that apply
 Fraunhofer supports the development of MPEG-H products and services by offering additional software, documentation, and technical advice. In addition, it operates the MPEG-H Trademark Program to ease interoperability testing of end-products. Please visit [www.mpegh.com](https://mpegh.com) for more information.
 
 For more information, please contact amm-info@iis.fraunhofer.de
+
