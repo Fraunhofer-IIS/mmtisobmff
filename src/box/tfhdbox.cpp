@@ -301,26 +301,26 @@ void CTrackFragmentHeaderBox::validate() {
 
 void CTrackFragmentHeaderBox::writeBox(ilo::ByteBuffer& buffer,
                                        ilo::ByteBuffer::iterator& position) const {
-  ilo::writeInt32(buffer, position, m_trackId);
+  ilo::writeUint32(buffer, position, m_trackId);
 
   if (m_baseDataOffsetPresent) {
     ilo::writeUint64(buffer, position, m_baseDataOffset);
   }
 
   if (m_sampleDescriptionIndexPresent) {
-    ilo::writeInt32(buffer, position, m_sampleDescriptionIndex);
+    ilo::writeUint32(buffer, position, m_sampleDescriptionIndex);
   }
 
   if (m_defaultSampleDurationPresent) {
-    ilo::writeInt32(buffer, position, m_defaultSampleDuration);
+    ilo::writeUint32(buffer, position, m_defaultSampleDuration);
   }
 
   if (m_defaultSampleSizePresent) {
-    ilo::writeInt32(buffer, position, m_defaultSampleSize);
+    ilo::writeUint32(buffer, position, m_defaultSampleSize);
   }
 
   if (m_defaultSampleFlagsPresent) {
-    ilo::writeInt32(buffer, position, m_defaultSampleFlags);
+    ilo::writeUint32(buffer, position, m_defaultSampleFlags);
   }
 }
 

@@ -88,7 +88,7 @@ amm-info@iis.fraunhofer.de
 // System headers
 #include <limits>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 // External headers
 #include "ilo/bytebuffertools.h"
@@ -155,16 +155,15 @@ void CCompactSampleSizeBox::parseBox(ilo::ByteBuffer::const_iterator& begin,
                   std::out_of_range, "Malformed stz2 box");
   m_entrySizes.resize(m_sampleCount);
 
-  uint16_t temp = 0;
   bool iteratorCorrection = m_fieldSize == 4 ? 1 : 0;
   uint16_t fieldSize4Mask = 240;  // 0000 0000 1111 0000
   uint16_t tmpEntry = 0;
   int8_t numberOfBytes = static_cast<int8_t>(ceil(m_fieldSize / 8.0f));
 
   for (uint32_t i = 0; i < m_sampleCount; i++) {
-    for (int8_t j = (numberOfBytes - 1); j >= 0; --j) {
-      temp = static_cast<uint16_t>(ilo::readUint8(begin, end) << (j * 8));
-      m_entrySizes[i] += temp;
+    for (int8_t j = static_cast<int8_t>(numberOfBytes - 1); j >= 0; --j) {
+      int32_t temp = ilo::readUint8(begin, end) << (j * 8);
+      m_entrySizes[i] = static_cast<uint16_t>(m_entrySizes[i] + temp);
     }
 
     if (m_fieldSize == 4) {
@@ -176,8 +175,8 @@ void CCompactSampleSizeBox::parseBox(ilo::ByteBuffer::const_iterator& begin,
           tmpEntry > 15 ? tmpEntry >> 4
                         : tmpEntry;  // tmpEntry > 15 decides if it is first 4 bits or second 4 bits
 
-      fieldSize4Mask =
-          255 - fieldSize4Mask;  // this will change the 4 bits of the mask back and forth
+      fieldSize4Mask = static_cast<uint16_t>(
+          255 - fieldSize4Mask);  // this will change the 4 bits of the mask back and forth
     }
   }
 }
@@ -209,8 +208,9 @@ SAttributeList CCompactSampleSizeBox::getAttributeList() const {
 }
 
 void CCompactSampleSizeBox::updateSize(uint64_t sizeValue) {
-  CFullBox::updateSize(sizeValue + 4 + 4 +
-                       static_cast<uint32_t>(ceil(m_entrySizes.size() * m_fieldSize / 8.0f)));
+  CFullBox::updateSize(
+      sizeValue + 4 + 4 +
+      static_cast<uint32_t>(ceil(static_cast<double>(m_entrySizes.size()) * m_fieldSize / 8.0f)));
 }
 
 void CCompactSampleSizeBox::writeBox(ilo::ByteBuffer& buffer,
@@ -233,7 +233,7 @@ void CCompactSampleSizeBox::writeBox(ilo::ByteBuffer& buffer,
         byteToWrite = static_cast<uint8_t>(m_entrySizes[i] << 4);
       } else {
         ILO_ASSERT(m_entrySizes[i + 1] <= 15,
-                   "entry %s can't be represented with the specified field size (4 bytes).",
+                   "entry %hu can't be represented with the specified field size (4 bytes).",
                    m_entrySizes[i + 1]);
         byteToWrite = static_cast<uint8_t>((m_entrySizes[i] << 4) + m_entrySizes[i + 1]);
       }
@@ -243,7 +243,7 @@ void CCompactSampleSizeBox::writeBox(ilo::ByteBuffer& buffer,
       bool condition = !(m_fieldSize == 16);
 
       do {
-        byteToWrite = (m_entrySizes[i] >> (!condition * 8) & 255);
+        byteToWrite = static_cast<uint8_t>(m_entrySizes[i] >> (!condition * 8) & 0xFF);
         ilo::writeUint8(buffer, position, (byteToWrite));
         condition = !condition;
       } while (condition);

@@ -133,7 +133,7 @@ void CDataEntryUrlBox::parseBox(ilo::ByteBuffer::const_iterator& begin,
   if (flags() == 0x000001) {
     m_location = "";
   } else {
-    m_location = ilo::readString(begin, end, end - begin);
+    m_location = ilo::readString(begin, end, static_cast<size_t>(end - begin));
   }
 }
 

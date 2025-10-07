@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
 Software License for The Fraunhofer FDK MPEG-H Software
 
-Copyright (c) 2016 - 2023 Fraunhofer-Gesellschaft zur Förderung der angewandten
+Copyright (c) 2016 - 2025 Fraunhofer-Gesellschaft zur Förderung der angewandten
 Forschung e.V. and Contributors
 All rights reserved.
 
@@ -82,73 +82,97 @@ amm-info@iis.fraunhofer.de
 
 /*
  * Project: MPEG-4 ISO Base Media File Format (ISO BMFF) library
- * Content: media data box class
+ * Content: mmtisobmff input class(es)
  */
 
-// System headers
+// System includes
 #include <stdexcept>
-#include <string>
-#include <limits>
 
-// External headers
-#include "ilo/string_utils.h"
-#include "ilo/bytebuffertools.h"
+// External includes
 
-// Internal headers
+// Internal includes
+#include "mmtisobmff/reader/input.h"
 #include "common/logging.h"
-#include "mdatbox.h"
+
+#if defined(WIN32) || defined(_WIN32)
+#define SEEK_OFFSET_T int64_t
+#elif defined __ANDROID__ && __ANDROID_API__ >= 24
+#define SEEK_OFFSET_T off64_t
+#else
+#define SEEK_OFFSET_T off_t
+#endif
 
 namespace mmt {
 namespace isobmff {
-namespace box {
+size_t CIsobmffFileInput::read(ilo::ByteBuffer::iterator inBegin, ilo::ByteBuffer::iterator inEnd) {
+  size_t len = static_cast<size_t>(inEnd - inBegin);
+  char* buffer = reinterpret_cast<char*>(&(*inBegin));
+  size_t actuallyRead = fread(buffer, sizeof(uint8_t), len, m_file.get());
 
-CMediaDataBox::CMediaDataBox(ilo::ByteBuffer::const_iterator& begin,
-                             const ilo::ByteBuffer::const_iterator& end)
-    : CBox(begin, end) {
-  parse(begin, end);
+  return actuallyRead;
 }
 
-CMediaDataBox::CMediaDataBox(const SMdatBoxWriteConfig& mdatBoxData)
-    : CBox(mdatBoxData), m_payloadSize(mdatBoxData.payloadSize) {
-  updateSize(0);
+void CIsobmffFileInput::seek(pos_type pos) {
+  int err = ilo_fseeko(m_file.get(), static_cast<SEEK_OFFSET_T>(pos), SEEK_SET);
+  ILO_ASSERT(err == 0, "Could not seek to position");
 }
 
-void CMediaDataBox::parse(ilo::ByteBuffer::const_iterator& begin,
-                          const ilo::ByteBuffer::const_iterator& end) {
-  ILO_ASSERT_WITH(CBox::type() == ilo::toFcc("mdat"), std::invalid_argument,
-                  "Expected box type mdat, but found: %s", ilo::toString(CBox::type()).c_str());
+void CIsobmffFileInput::seek(offset_type offset, SeekingOrigin origin) {
+  int err = 0;
 
-  auto headerSize = had64BitSizeInInput() ? 16U : 8U;
+  switch (origin) {
+    case SeekingOrigin::beg:
+      seek(static_cast<pos_type>(offset));
+      break;
+    case SeekingOrigin::end:
+      err = ilo_fseeko(m_file.get(), static_cast<SEEK_OFFSET_T>(offset), SEEK_END);
+      break;
+    case SeekingOrigin::cur:
+      err = ilo_fseeko(m_file.get(), static_cast<SEEK_OFFSET_T>(offset), SEEK_CUR);
+      break;
+  }
 
-  ILO_ASSERT_WITH(size() - headerSize <= static_cast<uint64_t>(end - begin), std::invalid_argument,
-                  "Payload size too small in mdat box");
-
-  m_payloadSize = size() - headerSize;
-  begin += static_cast<std::ptrdiff_t>(m_payloadSize);
+  ILO_ASSERT(err == 0, "Could not seek to position");
 }
 
-void CMediaDataBox::writeBox(ilo::ByteBuffer&, ilo::ByteBuffer::iterator&) const {
-  // header is written in CBox, skip payload
+bool CIsobmffFileInput::isEOI() {
+  auto c = fgetc(m_file.get());
+  ungetc(c, m_file.get());
+  return feof(m_file.get()) != 0;
 }
 
-uint64_t CMediaDataBox::payloadSize() const {
-  return m_payloadSize;
+size_t CIsobmffMemoryInput::read(ilo::ByteBuffer::iterator inBegin,
+                                 ilo::ByteBuffer::iterator inEnd) {
+  auto copyCount = std::min(inEnd - inBegin, buffer->end() - ptr);
+
+  std::copy(ptr, ptr + copyCount, inBegin);
+
+  ptr += copyCount;
+  return static_cast<size_t>(copyCount);
 }
 
-void CMediaDataBox::updateSize(uint64_t sizeValue) {
-  // size + data
-  CBox::updateSize(sizeValue + m_payloadSize);
+void CIsobmffMemoryInput::seek(pos_type pos) {
+  ILO_ASSERT_WITH(pos <= buffer->size(), std::out_of_range, "Position to seek to is out of range");
+  ptr = buffer->begin() + static_cast<ilo::ByteBuffer::difference_type>(pos);
 }
-}  // namespace box
+
+void CIsobmffMemoryInput::seek(offset_type offset, SeekingOrigin origin) {
+  switch (origin) {
+    case SeekingOrigin::beg:
+      seek((pos_type)offset);
+      break;
+    case SeekingOrigin::end:
+      ILO_ASSERT_WITH(offset <= 0 && buffer->size() >= static_cast<uint64_t>(std::abs(offset)),
+                      std::out_of_range, "Position to seek to is out of range");
+      ptr = buffer->end() + static_cast<ilo::ByteBuffer::difference_type>(offset);
+      break;
+    case SeekingOrigin::cur:
+      ILO_ASSERT_WITH(ptr + static_cast<std::ptrdiff_t>(offset) >= buffer->begin() &&
+                          ptr + static_cast<std::ptrdiff_t>(offset) <= buffer->end(),
+                      std::out_of_range, "Position to seek to is out of range");
+      ptr += static_cast<ilo::ByteBuffer::difference_type>(offset);
+      break;
+  }
+}
 }  // namespace isobmff
 }  // namespace mmt
-
-#include "box/boxregistryentry.h"
-#include <memory>
-
-using namespace mmt;
-using namespace mmt::isobmff;
-using namespace mmt::isobmff::box;
-
-BOXREGISTRY_DECLARE(mdat, CMediaDataBox, CMediaDataBox::SMdatBoxWriteConfig,
-                    CContainerType::noContainer);

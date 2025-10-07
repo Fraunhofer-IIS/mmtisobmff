@@ -129,8 +129,7 @@ void CJxsDecoderConfigRecord::write(ilo::ByteBuffer& buffer, ilo::ByteBuffer::it
                   "Invalid input buffer position.");
   ILO_ASSERT_WITH(static_cast<size_t>(buffer.end() - position) >= m_codestreamHeader.size(),
                   std::invalid_argument, "Unable to copy decoder config record.");
-  std::copy(m_codestreamHeader.begin(), m_codestreamHeader.end(), position);
-  position += m_codestreamHeader.size();
+  position = std::copy(m_codestreamHeader.begin(), m_codestreamHeader.end(), position);
 }
 
 uint64_t CJxsDecoderConfigRecord::size() const {

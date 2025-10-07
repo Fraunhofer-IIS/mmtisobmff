@@ -143,14 +143,15 @@ void CVvcDecoderConfigRecord::setPtl(const SVvcPtl& ptl) {
   if (ptl.numSublayers < 2) {
     ILO_ASSERT_WITH(
         ptl.nativePtl.sublayerLevelIdcs.empty(), std::invalid_argument,
-        "NumSublayers in VvcPtlRecord is %d. If the value is smaller than 2 there cannot "
-        "be any sublayerLevelIdcs present, but sublayerLevelIdc map contains %d entries.",
+        "NumSublayers in VvcPtlRecord is %hhu. If the value is smaller than 2 there cannot "
+        "be any sublayerLevelIdcs present, but sublayerLevelIdc map contains %zu entries.",
         ptl.numSublayers, ptl.nativePtl.sublayerLevelIdcs.size());
   } else {
-    ILO_ASSERT_WITH(
-        ptl.nativePtl.sublayerLevelIdcs.size() < ptl.numSublayers, std::invalid_argument,
-        "The max allowed number of sublayerLevelIdcs (%d) must be smaller than numSublayers (%d).",
-        ptl.nativePtl.sublayerLevelIdcs.size(), ptl.numSublayers);
+    ILO_ASSERT_WITH(ptl.nativePtl.sublayerLevelIdcs.size() < ptl.numSublayers,
+                    std::invalid_argument,
+                    "The max allowed number of sublayerLevelIdcs (%zu) must be smaller than "
+                    "numSublayers (%hhu).",
+                    ptl.nativePtl.sublayerLevelIdcs.size(), ptl.numSublayers);
   }
 
   ILO_ASSERT_WITH(!ptl.nativePtl.generalConstraintInfo.empty(), std::invalid_argument,
@@ -186,7 +187,7 @@ void CVvcDecoderConfigRecord::setNonVclArrays(const NonVclArrays& nonVclArraysVa
     // 12 == OPI_NUT, 13 == DCI_NUT
     if (nonVclArray.naluType == 13 || nonVclArray.naluType == 12) {
       ILO_ASSERT_WITH(nonVclArray.nalus.size() == 1, std::invalid_argument,
-                      "There can only be 1 nalu of type %d in this array, but %d were found.",
+                      "There can only be 1 nalu of type %d in this array, but %zu were found.",
                       nonVclArray.naluType, nonVclArray.nalus.size());
     }
   }
@@ -231,13 +232,12 @@ void CVvcDecoderConfigRecord::write(ByteBuffer& buffer, ByteBuffer::iterator& po
       uint32_t pos = bitWriter.tell();
 
       // Set the position iterator to the current position
-      position = buffer.begin() + pos / 8;
+      position = buffer.begin() + static_cast<std::ptrdiff_t>(pos / 8);
 
       ILO_ASSERT(static_cast<size_t>(buffer.end() - position) >= nalu.size(),
                  "Nalu data does not fit in buffer.");
 
-      std::copy(nalu.begin(), nalu.end(), position);
-      position += nalu.size();
+      position = std::copy(nalu.begin(), nalu.end(), position);
 
       // Update bitwriter writer pointer position
       bitWriter.seek(static_cast<int32_t>(nalu.size() * 8), ilo::EPosType::cur);
@@ -456,7 +456,7 @@ void CVvcDecoderConfigRecord::parse(ilo::ByteBuffer::const_iterator& begin,
                                     const ilo::ByteBuffer::const_iterator& end) {
   ilo::ByteBuffer::difference_type totalDcrSize = end - begin;
   ILO_ASSERT(static_cast<uint64_t>(totalDcrSize) <= std::numeric_limits<uint32_t>::max() / 8U,
-             "VVC Decoder Config Record size of %d bytes exceeds bitparser capabilities.",
+             "VVC Decoder Config Record size of %ld bytes exceeds bitparser capabilities.",
              totalDcrSize);
 
   ilo::CBitParser bitParser{begin, end};
@@ -493,7 +493,7 @@ void CVvcDecoderConfigRecord::parse(ilo::ByteBuffer::const_iterator& begin,
     if (std::find(ALLOWED_VVC_NALU_TYPES.begin(), ALLOWED_VVC_NALU_TYPES.end(), array.naluType) ==
         ALLOWED_VVC_NALU_TYPES.end()) {
       ILO_LOG_WARNING(
-          "Potentially forbidden non-VCL NALU type of %d found in VVC decoder config record.",
+          "Potential unallowed non-VCL nalu type of %d found in vvc decoder config record.",
           array.naluType);
     }
 
@@ -509,8 +509,10 @@ void CVvcDecoderConfigRecord::parse(ilo::ByteBuffer::const_iterator& begin,
       uint16_t nalUnitLength = bitParser.read<uint16_t>(16);
       ILO_ASSERT_WITH(bitParser.nofReadBits() % 8 == 0, std::logic_error,
                       "Bitreader is not byte-aligned when copying non-VCL nalus.");
-      ilo::ByteBuffer::const_iterator naluBegin = begin + bitParser.nofReadBits() / 8;
-      ilo::ByteBuffer::const_iterator naluEnd = begin + bitParser.nofReadBits() / 8 + nalUnitLength;
+      ilo::ByteBuffer::const_iterator naluBegin =
+          begin + static_cast<std::ptrdiff_t>(bitParser.nofReadBits() / 8);
+      ilo::ByteBuffer::const_iterator naluEnd =
+          begin + static_cast<std::ptrdiff_t>(bitParser.nofReadBits() / 8 + nalUnitLength);
       array.nalus.emplace_back(naluBegin, naluEnd);
       ILO_ASSERT(array.nalus.back().size() == nalUnitLength, "Failed to read nalu.");
       bitParser.seek(nalUnitLength * 8, ilo::EPosType::cur);
@@ -568,8 +570,8 @@ void CVvcDecoderConfigRecord::parsePtlRecord(ilo::CBitParser& bitParser) {
   std::map<uint8_t, bool> ptlSublayerLevelPresentFlags;
 
   if (m_ptl.numSublayers >= 2) {
-    for (int8_t i = m_ptl.numSublayers - 2; i >= 0; --i) {
-      ptlSublayerLevelPresentFlags[i] = bitParser.read<uint8_t>(1) > 0;
+    for (int8_t i = static_cast<int8_t>(m_ptl.numSublayers - 2); i >= 0; --i) {
+      ptlSublayerLevelPresentFlags[static_cast<uint8_t>(i)] = bitParser.read<uint8_t>(1) > 0;
     }
   }
 
@@ -581,9 +583,9 @@ void CVvcDecoderConfigRecord::parsePtlRecord(ilo::CBitParser& bitParser) {
   }
 
   if (m_ptl.numSublayers >= 2) {
-    for (int8_t i = m_ptl.numSublayers - 2; i >= 0; --i) {
-      if (ptlSublayerLevelPresentFlags.at(i)) {
-        m_ptl.nativePtl.sublayerLevelIdcs[i] = bitParser.read<uint8_t>(8);
+    for (int8_t i = static_cast<int8_t>(m_ptl.numSublayers - 2); i >= 0; --i) {
+      if (ptlSublayerLevelPresentFlags.at(static_cast<uint8_t>(i))) {
+        m_ptl.nativePtl.sublayerLevelIdcs[static_cast<uint8_t>(i)] = bitParser.read<uint8_t>(8);
       }
     }
   }
@@ -662,9 +664,10 @@ void CVvcDecoderConfigRecord::writePtlRecord(ilo::CBitBuffer& bitWriter) {
   writeConstraintInfo(bitWriter, validGeneralConstraintInfoBits);
 
   // Note: do not use uint8_t here to avoid overflow.
-  for (int8_t i = static_cast<int8_t>(m_ptl.numSublayers) - 2; i >= 0; --i) {
+  for (int8_t i = static_cast<int8_t>(m_ptl.numSublayers - 2); i >= 0; --i) {
     bool ptlSubLayerlevelPresentFlag =
-        (m_ptl.nativePtl.sublayerLevelIdcs.find(i) != m_ptl.nativePtl.sublayerLevelIdcs.end());
+        (m_ptl.nativePtl.sublayerLevelIdcs.find(static_cast<uint8_t>(i)) !=
+         m_ptl.nativePtl.sublayerLevelIdcs.end());
     bitWriter.write(ptlSubLayerlevelPresentFlag);
   }
 
@@ -674,8 +677,8 @@ void CVvcDecoderConfigRecord::writePtlRecord(ilo::CBitBuffer& bitWriter) {
   }
 
   // Note: do not use uint8_t here to avoid overflow.
-  for (int8_t i = static_cast<int8_t>(m_ptl.numSublayers) - 2; i >= 0; --i) {
-    auto iter = m_ptl.nativePtl.sublayerLevelIdcs.find(i);
+  for (int8_t i = static_cast<int8_t>(m_ptl.numSublayers - 2); i >= 0; --i) {
+    auto iter = m_ptl.nativePtl.sublayerLevelIdcs.find(static_cast<uint8_t>(i));
     if (iter != m_ptl.nativePtl.sublayerLevelIdcs.end()) {
       bitWriter.write(iter->second, 8);
     }

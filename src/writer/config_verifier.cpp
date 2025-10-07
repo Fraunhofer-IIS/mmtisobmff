@@ -116,8 +116,8 @@ CMovieConfigVerifier::CMovieConfigVerifier(const SMovieConfig& config, bool stri
 
       ILO_ASSERT_WITH(compBrandsOcc == 1, std::invalid_argument,
                       "Compatible brands have to be unique! The following brands was specified "
-                      "multiple times: %d",
-                      curBrand);
+                      "multiple times: %u",
+                      *reinterpret_cast<const uint32_t*>(curBrand.data()));
     }
 
     ILO_ASSERT(config.movieTimeScale > 0,

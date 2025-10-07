@@ -108,7 +108,7 @@ CSLConfigDescriptor::CSLConfigDescriptor() : CBaseDescriptor(EDescriptorTag::SLC
 CSLConfigDescriptor::CSLConfigDescriptor(ilo::ByteBuffer::const_iterator& begin,
                                          const ilo::ByteBuffer::const_iterator& end)
     : CBaseDescriptor(begin, end), m_predefined(0) {
-  CSLConfigDescriptor::parse(begin, begin + size());
+  CSLConfigDescriptor::parse(begin, begin + static_cast<std::ptrdiff_t>(size()));
 }
 
 void CSLConfigDescriptor::parse(ilo::ByteBuffer::const_iterator& begin,

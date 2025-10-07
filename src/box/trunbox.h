@@ -143,7 +143,7 @@ class CTrackRunBox : public CFullBox {
     bool sampleFlagsPresent = false;
     bool sampleCtsOffsetPresent = false;
     uint32_t sampleCount = 0;
-    uint32_t dataoffset = 0;
+    int32_t dataoffset = 0;
     uint32_t firstSampleFlags = 0;
     std::vector<CTrunEntry> trunEntries;
 
@@ -171,7 +171,7 @@ class CTrackRunBox : public CFullBox {
 
   uint32_t sampleCount() const { return m_sampleCount; }
 
-  uint32_t dataOffset() const;
+  int32_t dataOffset() const;
 
   uint32_t firstSampleFlags() const;
 

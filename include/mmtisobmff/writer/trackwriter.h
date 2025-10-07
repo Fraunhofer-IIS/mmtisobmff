@@ -238,7 +238,7 @@ struct SBaseVideoConfig : STrackConfig {
   std::string compressorName = "";
 };
 
-/* ######---MPEGH Track Writer---###### */
+/* ######---MPEG-H Track Writer---###### */
 
 //! General MPEG-H config valid for all MPEG-H track types
 struct SMpeghTrackConfig : SBaseAudioConfig {

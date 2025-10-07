@@ -89,6 +89,7 @@ amm-info@iis.fraunhofer.de
 #include <stdexcept>
 #include <limits>
 #include <algorithm>
+#include <cinttypes>
 
 // External headers
 #include "ilo/bytebuffertools.h"
@@ -218,7 +219,8 @@ void CMediaHeaderBox::writeBox(ilo::ByteBuffer& buffer, ilo::ByteBuffer::iterato
 void CMediaHeaderBox::sanityCheck() {
   if (m_creationTime > m_modificationTime) {
     ILO_LOG_WARNING(
-        "Warning: in mdhd box, creation time of MP4 is smaller than modifcation time: %u, %u",
+        "Warning: in mdhd box, creation time of MP4 is smaller than modifcation time: %" PRIu64
+        ", %" PRIu64,
         m_creationTime, m_modificationTime);
   }
 }

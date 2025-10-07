@@ -86,6 +86,7 @@ amm-info@iis.fraunhofer.de
  */
 
 // System includes
+#include <cinttypes>
 #include <cmath>
 
 // External includes
@@ -137,7 +138,7 @@ SSampleExtraInfo CSampleReader::nextSample(CSample& sample, bool preallocate) {
   ILO_ASSERT(currentMetadataSample.size > 0, "Metadata sample has a size of 0");
   sample.rawData.resize(static_cast<size_t>(currentMetadataSample.size));
 
-  m_input->seek(currentMetadataSample.offset, SeekingOrigin::beg);
+  m_input->seek(static_cast<offset_type>(currentMetadataSample.offset), SeekingOrigin::beg);
   auto readCount = m_input->read(sample.rawData.begin(), sample.rawData.end());
   sample.rawData.resize(readCount);
   ILO_ASSERT_WITH(sample.rawData.size() == static_cast<size_t>(currentMetadataSample.size),
@@ -147,13 +148,14 @@ SSampleExtraInfo CSampleReader::nextSample(CSample& sample, bool preallocate) {
 
   if (currentMetadataSample.dtsValue + currentMetadataSample.ctsOffset < 0) {
     sExtraInfo.timestamp = CIsoTimestamp();
-    ILO_LOG_ERROR("PTS issue. CTS offset of %d and DTS value of %d result in negative PTS.",
+    ILO_LOG_ERROR("PTS issue. CTS offset of %" PRId64 " and DTS value of %" PRId64
+                  " result in negative PTS.",
                   currentMetadataSample.ctsOffset, currentMetadataSample.dtsValue);
   } else {
-    sExtraInfo.timestamp =
-        CIsoTimestamp(currentMetadataSample.timeScale,
-                      currentMetadataSample.dtsValue + currentMetadataSample.ctsOffset,
-                      currentMetadataSample.dtsValue);
+    sExtraInfo.timestamp = CIsoTimestamp(
+        currentMetadataSample.timeScale,
+        static_cast<uint64_t>(currentMetadataSample.dtsValue + currentMetadataSample.ctsOffset),
+        currentMetadataSample.dtsValue);
   }
   return sExtraInfo;
 }
@@ -179,13 +181,14 @@ SSampleExtraInfo CSampleReader::resolveTimestamp(const SSeekConfig& seekConfig) 
   CMetaSample currentMetadataSample = m_trackSampleInfo[targetFrameIndex];
   if (currentMetadataSample.dtsValue + currentMetadataSample.ctsOffset < 0) {
     sExtraInfo.timestamp = CIsoTimestamp();
-    ILO_LOG_ERROR("PTS issue. CTS offset of %d and DTS value of %d result in negative PTS.",
+    ILO_LOG_ERROR("PTS issue. CTS offset of %" PRId64 " and DTS value of %" PRId64
+                  " result in negative PTS.",
                   currentMetadataSample.ctsOffset, currentMetadataSample.dtsValue);
   } else {
-    sExtraInfo.timestamp =
-        CIsoTimestamp(currentMetadataSample.timeScale,
-                      currentMetadataSample.dtsValue + currentMetadataSample.ctsOffset,
-                      currentMetadataSample.dtsValue);
+    sExtraInfo.timestamp = CIsoTimestamp(
+        currentMetadataSample.timeScale,
+        static_cast<uint64_t>(currentMetadataSample.dtsValue + currentMetadataSample.ctsOffset),
+        currentMetadataSample.dtsValue);
   }
   return sExtraInfo;
 }
@@ -204,7 +207,8 @@ std::size_t CSampleReader::sampleIndexForTimestamp(const SSeekConfig& seekConfig
   bool foundUserSeekPosition = false;
   size_t userSeekPositionIndex = 0;
 
-  double userSeekTime = seekConfig.seekPoint.duration() / (double)seekConfig.seekPoint.timescale();
+  double userSeekTime = static_cast<double>(seekConfig.seekPoint.duration()) /
+                        static_cast<double>(seekConfig.seekPoint.timescale());
   double currentTime = 0;
 
   for (const auto& metaSample : m_trackSampleInfo) {
@@ -217,7 +221,7 @@ std::size_t CSampleReader::sampleIndexForTimestamp(const SSeekConfig& seekConfig
     }
 
     // Check if we reached user time
-    currentTime = accDuration / (double)metaSample.timeScale;
+    currentTime = static_cast<double>(accDuration) / static_cast<double>(metaSample.timeScale);
     if (currentTime >= userSeekTime && !foundUserSeekPosition) {
       userSeekPositionIndex = frameIndex;
       foundUserSeekPosition = true;

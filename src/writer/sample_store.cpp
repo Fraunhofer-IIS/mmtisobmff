@@ -187,7 +187,7 @@ ilo::CUniqueBuffer CSampleStore::storedSamples(size_t maxBufferSize, uint32_t fr
 
   // We still have data left (m_size != 0, but we are at the end of the
   // metadata vector => Data might be fragmented, but not all fragments
-  // are read => Indicate with nullptr, that reading of this fragment is complete
+  // are read => Indicate with nullptr, that reading if this fragment is complete
   if (m_sampleIndex >= m_alignedMetaData.size() && m_lastFragNum <= fragmentNumber) {
     return nullptr;
   }
@@ -226,7 +226,7 @@ ilo::CUniqueBuffer CSampleStore::storedSamples(size_t maxBufferSize, uint32_t fr
   }
 
   ILO_ASSERT(totalSize != 0,
-             "Not able to query samples from store. Maybe MaxChunkSize of %d bytes is too small "
+             "Not able to query samples from store. Maybe MaxChunkSize of %zu bytes is too small "
              "to hold a single sample.",
              maxBufferSize);
 
@@ -238,7 +238,8 @@ ilo::CUniqueBuffer CSampleStore::storedSamples(size_t maxBufferSize, uint32_t fr
   for (const auto& byteRange : byteRanges) {
     auto readBuff =
         m_sink->read(static_cast<size_t>(byteRange.first), static_cast<size_t>(byteRange.second));
-    std::copy(readBuff->begin(), readBuff->end(), buffer->begin() + copiedSize);
+    std::copy(readBuff->begin(), readBuff->end(),
+              buffer->begin() + static_cast<std::ptrdiff_t>(copiedSize));
     copiedSize += readBuff->size();
   }
 

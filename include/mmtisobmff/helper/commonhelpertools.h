@@ -437,14 +437,18 @@ std::unique_ptr<ITrackWriter> createTrackWriter(CIsobmffWriter& writer,
 
 /*!
  * @brief MP4 format types
- *
- **/
+ */
 enum class EMp4Type {
-  unknown,       /**< Type cannot be deduced. It is either no MP4 file or an unknown type */
-  initSegment,   /**< Contains only 'moov', but no 'moof' and no 'mdat' */
-  mediaSegment,  /**< Contains only 'moof' and 'mdat', but no 'moov' */
-  fragmentedMp4, /**< Contains 'moov', 'moof' and 'mdat' */
-  flatMp4        /**< Contains 'moov' and 'mdat', but no 'moof' */
+  /*! Type cannot be deduced. It is either no MP4 file or an unknown type */
+  unknown,
+  /*! Contains only 'moov', but no 'moof' and no 'mdat' */
+  initSegment,
+  /*! Contains only 'moof' and 'mdat', but no 'moov' */
+  mediaSegment,
+  /*! Contains 'moov', 'moof' and 'mdat' */
+  fragmentedMp4,
+  /*! Contains 'moov' and 'mdat', but no 'moof' */
+  flatMp4
 };
 
 /*!

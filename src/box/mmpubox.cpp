@@ -215,14 +215,14 @@ void CMediaProcessingUnitBox::writeBox(ilo::ByteBuffer& buffer,
   uint8_t tmp = 0;
 
   if (m_isComplete) {
-    tmp += (uint8_t(1) << 7);
+    tmp = static_cast<uint8_t>(tmp + uint8_t{1 << 7});
   }
 
   if (m_isAdcPresent) {
-    tmp += (uint8_t(1) << 6);
+    tmp = static_cast<uint8_t>(tmp + uint8_t{1 << 6});
   }
 
-  tmp += uint8_t(m_reserved);
+  tmp = static_cast<uint8_t>(tmp + m_reserved);
 
   ilo::writeUint8(buffer, position, tmp);
   ilo::writeUint32(buffer, position, m_mpuSequenceNumber);

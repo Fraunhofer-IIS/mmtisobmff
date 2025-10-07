@@ -389,7 +389,7 @@ bool SDrcInfo::trackHasLudtUpdates(const uint32_t trackIndex) const {
   if (trackIndex >= m_pimpl->m_trackFragIndexToFragLudt.size()) {
     ILO_LOG_WARNING(
         "User requested info about ludt updates from an invalid "
-        "trackIndex of %d with a total of %d tracks.",
+        "trackIndex of %u with a total of %zu tracks.",
         trackIndex, m_pimpl->m_trackFragIndexToFragLudt.size());
     return false;
   }

@@ -178,9 +178,12 @@ CMovieInfo CIsobmffReader::movieInfo() const {
   result.duration = mvhd->duration();
 
   auto ftype = findFirstBoxWithFourccAndType<box::CFileTypeBox>(p->tree(), ilo::toFcc("ftyp"));
-  ILO_ASSERT(ftype != nullptr, "no ftyp box found");
-  result.majorBrand = ftype->majorBrand();
-  result.compatibleBrands = ftype->compatibleBrands();
+  if (ftype) {
+    result.majorBrand = ftype->majorBrand();
+    result.compatibleBrands = ftype->compatibleBrands();
+  } else {
+    ILO_LOG_WARNING("no ftyp box found!");
+  }
 
   auto moov =
       findFirstElementWithFourccAndBoxType<box::CContainerBox>(p->tree(), ilo::toFcc("moov"));

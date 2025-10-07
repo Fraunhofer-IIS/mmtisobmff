@@ -145,8 +145,9 @@ SCommandlineParams parseCommanline(int argc, char** argv) {
       cmdLineParams.inFileUri = std::string(argv[++i]);
     } else if (std::string(argv[i]) == "-of" && i + 1 < argc) {
       cmdLineParams.outFileUri = std::string(argv[++i]);
-    } else  // invalid argument or missing value for argument
-    {
+    } else {
+      // invalid argument or missing value for argument
+
       std::string errorMsg;
       if (i + 1 < argc) {
         errorMsg = "Unknown argument found: " + std::string(argv[i]);

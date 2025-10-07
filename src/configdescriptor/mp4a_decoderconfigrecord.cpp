@@ -139,8 +139,9 @@ CMp4aDecoderConfigRecord::CMp4aDecoderConfigRecord(const CMp4aDecoderConfigRecor
 
   // The esd size is only the esd payload size. Calculate the tag/size
   uint8_t numBytes = static_cast<uint8_t>(esd.size() / MAX_SIZE_IN_ONE_BYTE);
-  numBytes += (esd.size() % MAX_SIZE_IN_ONE_BYTE) ? (1) : (0);
-  numBytes += 1;  // m_tag
+  numBytes = static_cast<uint8_t>(numBytes +
+                                  ((esd.size() % MAX_SIZE_IN_ONE_BYTE) ? uint8_t{1} : uint8_t{0}));
+  numBytes = static_cast<uint8_t>(numBytes + 1U);  // m_tag
 
   m_esdsByteBlob.resize(esd.size() + numBytes);
   ilo::ByteBuffer::iterator iter = m_esdsByteBlob.begin();
@@ -208,12 +209,10 @@ SAttributeList CMp4aDecoderConfigRecord::getAttributeList() const {
 
 uint64_t CMp4aDecoderConfigRecord::write(ilo::ByteBuffer& buffer,
                                          ilo::ByteBuffer::iterator& position) {
-  ILO_ASSERT(position + m_esdsByteBlob.size() <= buffer.end(),
+  ILO_ASSERT(position + static_cast<std::ptrdiff_t>(m_esdsByteBlob.size()) <= buffer.end(),
              "Buffer is too small to hold esds data");
 
-  std::copy(m_esdsByteBlob.begin(), m_esdsByteBlob.end(), position);
-  position += m_esdsByteBlob.size();
-
+  position = std::copy(m_esdsByteBlob.begin(), m_esdsByteBlob.end(), position);
   return m_esdsByteBlob.size();
 }
 }  // namespace config

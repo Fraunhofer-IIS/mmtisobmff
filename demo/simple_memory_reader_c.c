@@ -115,7 +115,7 @@ int readFileIntoMemory(const char* inputFile, uint8_t** memoryFile, size_t* memo
     return 1;
   }
 
-  size = ftell(file);
+  size = (size_t)ftell(file);
   if (size <= 0) {
     printf("Error: Unable to optain file size of input file %s.\n", inputFile);
     fclose(file);

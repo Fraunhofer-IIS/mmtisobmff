@@ -311,8 +311,7 @@ void CJPEGXSVideoInformationBox::verify() const {
   ILO_ASSERT_WITH(CBox::type() == ilo::toFcc("jpvi"), std::invalid_argument,
                   "Expected box type jpvi, but found: %s", ilo::toString(CBox::type()).c_str());
   ILO_ASSERT_WITH(m_brat > 0, std::invalid_argument,
-                  "Maximum bitrate of video stream is expected to be bigger than 0",
-                  ilo::toString(CBox::type()).c_str());
+                  "Maximum bitrate of video stream is expected to be bigger than 0");
 
   uint32_t hours = (m_tcod & 0xff000000) >> 24;
   uint32_t minutes = (m_tcod & 0x00ff0000) >> 16;
@@ -320,16 +319,13 @@ void CJPEGXSVideoInformationBox::verify() const {
   uint32_t frames = (m_tcod & 0x000000ff);
 
   ILO_ASSERT_WITH(frames >= 1 && frames <= 60, std::invalid_argument,
-                  "Number for frames has to be in range from 1 to 60",
-                  ilo::toString(CBox::type()).c_str());
+                  "Number for frames has to be in range from 1 to 60");
   ILO_ASSERT_WITH(seconds <= 59, std::invalid_argument,
-                  "Maximum number for seconds in time code is 59",
-                  ilo::toString(CBox::type()).c_str());
+                  "Maximum number for seconds in time code is 59");
   ILO_ASSERT_WITH(minutes <= 59, std::invalid_argument,
-                  "Maximum number for minutes in time code is 59",
-                  ilo::toString(CBox::type()).c_str());
-  ILO_ASSERT_WITH(hours <= 23, std::invalid_argument, "Maximum number for hours in time code is 23",
-                  ilo::toString(CBox::type()).c_str());
+                  "Maximum number for minutes in time code is 59");
+  ILO_ASSERT_WITH(hours <= 23, std::invalid_argument,
+                  "Maximum number for hours in time code is 23");
 }
 }  // namespace box
 }  // namespace isobmff

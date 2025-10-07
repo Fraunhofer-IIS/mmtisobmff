@@ -134,10 +134,10 @@ void CSoundMediaHeaderBox::parseBox(ilo::ByteBuffer::const_iterator& begin,
 }
 
 float CSoundMediaHeaderBox::balanceHR() {
-  uint8_t real = (m_balance & 0xFF00) >> 8;
-  uint8_t frac = (m_balance & 0x00FF);
-  float fracFloat = (float)frac / 256;
-  return (int8_t)real + fracFloat;
+  uint8_t real = static_cast<uint8_t>((m_balance & 0xFF00) >> 8);
+  uint8_t frac = static_cast<uint8_t>(m_balance & 0x00FF);
+  float fracFloat = static_cast<float>(frac) / 256.0F;
+  return static_cast<float>(real) + fracFloat;
 }
 
 void CSoundMediaHeaderBox::updateSize(uint64_t sizeValue) {
@@ -162,12 +162,12 @@ void CSoundMediaHeaderBox::writeBox(ilo::ByteBuffer& buffer,
 }
 
 void CSoundMediaHeaderBox::sanityCheck() {
-  uint8_t real = (m_balance & 0xFF00) >> 8;
-  uint8_t frac = (m_balance & 0x00FF);
-  float fracFloat = (float)frac / 256;
-  float balanceVal = (int8_t)real + fracFloat;
+  uint8_t real = static_cast<uint8_t>((m_balance & 0xFF00) >> 8);
+  uint8_t frac = static_cast<uint8_t>(m_balance & 0x00FF);
+  float fracFloat = static_cast<float>(frac) / 256.0F;
+  float balanceVal = static_cast<float>(real) + fracFloat;
 
-  if (balanceVal >= 1 || balanceVal <= -1) {
+  if (balanceVal >= 1.0F || balanceVal <= -1.0F) {
     ILO_LOG_WARNING("Warning: balance has to be in within [-1, 1] in smhd box");
   }
 }

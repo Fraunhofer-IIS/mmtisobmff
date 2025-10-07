@@ -110,7 +110,7 @@ CTrakEditListEnhancer::CTrakEditListEnhancer(BoxElement& subTree, const SEditLis
     double fractpart = modf(editListEntry.mediaRate, &intpart);
 
     if (fractpart != 0) {
-      ILO_LOG_WARNING("Edit list with fractal mediaRate part of %d is not allowed", fractpart);
+      ILO_LOG_WARNING("Edit list with fractal mediaRate part of %f is not allowed", fractpart);
     }
     box::CEditListBox::SElstEntry entry;
     entry.mediaTime = editListEntry.mediaTime;

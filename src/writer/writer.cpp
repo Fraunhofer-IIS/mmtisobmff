@@ -208,8 +208,8 @@ CIsobmffBaseFragWriter::CIsobmffBaseFragWriter(std::unique_ptr<IIsobmffOutput>&&
   pimplConfig.timeNowUtc = timeNowUtc;
   pimplConfig.hasFragments = true;
   pimplConfig.forceTfdtV1 = config.forceTfdtBoxV1;
-  pimplConfig.writeSidx = config.sidxConfig != nullptr;
-  pimplConfig.writeIods = config.iodsConfig != nullptr;
+  pimplConfig.writeSidx = config.sidxConfig ? true : false;
+  pimplConfig.writeIods = config.iodsConfig ? true : false;
   pimplConfig.chunkSize = CHUNK_SIZE_IN_MS;
 
   if (pimplConfig.writeSidx) {
@@ -386,7 +386,7 @@ CIsobmffBaseWriter::CIsobmffBaseWriter(const std::string& outUri, const std::str
   pimplConfig.timeNowUtc = timeNowUtc;
   pimplConfig.hasFragments = false;
   pimplConfig.forceTfdtV1 = config.forceTfdtBoxV1;
-  pimplConfig.writeIods = config.iodsConfig != nullptr;
+  pimplConfig.writeIods = config.iodsConfig ? true : false;
   pimplConfig.chunkSize = CHUNK_SIZE_IN_MS;
   pimplConfig.tmpFileName = tmpFileName;
   p = ilo::make_unique<Pimpl>(pimplConfig);

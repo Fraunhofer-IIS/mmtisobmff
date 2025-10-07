@@ -126,8 +126,8 @@ void parseVideoSampleNalus(SNaluSample& naluSample, uint32_t lengthSizeMinusOne)
     ILO_ASSERT(naluLength > 0, "Nalu must have a length greater than zero");
     ILO_ASSERT(static_cast<int64_t>(naluLength) <= naluSample.sample.rawData.end() - iter,
                "Incorrect nalu length or malformed nalu");
-    naluSample.addNalu(iter, iter + naluLength);
-    iter += naluLength;
+    naluSample.addNalu(iter, iter + static_cast<std::ptrdiff_t>(naluLength));
+    iter += static_cast<std::ptrdiff_t>(naluLength);
   }
   ILO_ASSERT(iter == naluSample.sample.rawData.end(),
              "nalus not parsed to the end - invalid video sample");
@@ -172,10 +172,8 @@ void convertVideoSampleToAnnexBNalus(const SNaluSample& naluSample, SNaluSample&
     const ilo::ByteBuffer& startCode = predicate(*(nalu.begin() + offset));
     auto begin = iter;
 
-    std::copy(startCode.begin(), startCode.end(), iter);
-    iter += startCode.size();
-    std::copy(nalu.begin(), nalu.end(), iter);
-    iter += nalu.size();
+    iter = std::copy(startCode.begin(), startCode.end(), iter);
+    iter = std::copy(nalu.begin(), nalu.end(), iter);
 
     annexbNaluSample.addNalu(begin, iter);
   }
@@ -274,11 +272,11 @@ size_t requiredAnnexbNaluSampleSize(const config::CVvcDecoderConfigRecord& confi
 
 void populateAnnexB(const ilo::ByteBuffer& nonvcl, ilo::ByteBuffer::iterator& rawDataPosition,
                     SNaluSample& out) {
-  std::copy(startCodeFour.begin(), startCodeFour.end(), rawDataPosition);
-  std::copy(nonvcl.begin(), nonvcl.end(), rawDataPosition + startCodeFour.size());
+  auto rawDataEnd = std::copy(startCodeFour.begin(), startCodeFour.end(), rawDataPosition);
+  rawDataEnd = std::copy(nonvcl.begin(), nonvcl.end(), rawDataEnd);
 
-  out.addNalu(rawDataPosition, rawDataPosition + startCodeFour.size() + nonvcl.size());
-  rawDataPosition += startCodeFour.size() + nonvcl.size();
+  out.addNalu(rawDataPosition, rawDataEnd);
+  rawDataPosition = rawDataEnd;
 }
 
 void convertNonVclNalusToAnnexBNalus(const config::CAvcDecoderConfigRecord& configRecord,
@@ -364,7 +362,7 @@ size_t computeVideoSampleSize(const SVideoNalus& videoNalus, uint8_t lengthPrefi
       offset = calculateStartCodeLength(nalu);
       ILO_ASSERT(nalu.size() > offset,
                  "Video Nalu has a malformed startcode/payload structure. "
-                 "Startcode size is %d, payload size is %d",
+                 "Startcode size is %zu, payload size is %zu",
                  offset, nalu.size());
     }
 
@@ -395,35 +393,35 @@ void convertGeneralVideoNalusToVideoSample(const SVideoNalus& videoNalus, uint8_
 
     ILO_ASSERT(nalu.size() > offset,
                "Video Nalu has a malformed startcode/paload structure. "
-               "Startcode size is %d, payload size is %d",
+               "Startcode size is %zu, payload size is %zu",
                offset, nalu.size());
     size_t naluSize = nalu.size() - offset;
 
     switch (lengthPrefixSize) {
       case 1:
         ILO_ASSERT(naluSize <= std::numeric_limits<uint8_t>::max(),
-                   "Nalu size of %d is bigger than signaled lengthPrefixSize of %d", naluSize,
+                   "Nalu size of %zu is bigger than signaled lengthPrefixSize of %d", naluSize,
                    lengthPrefixSize);
         ilo::writeUint8(iter, end, static_cast<uint8_t>(naluSize));
         break;
       case 2:
         ILO_ASSERT(naluSize <= std::numeric_limits<uint16_t>::max(),
-                   "Nalu size of %d is bigger than signaled lengthPrefixSize of %d", naluSize,
+                   "Nalu size of %zu is bigger than signaled lengthPrefixSize of %d", naluSize,
                    lengthPrefixSize);
         ilo::writeUint16(iter, end, static_cast<uint16_t>(naluSize));
         break;
       case 4:
         ILO_ASSERT(naluSize <= std::numeric_limits<uint32_t>::max(),
-                   "Nalu size of %d is bigger than signaled lengthPrefixSize of %d", naluSize,
+                   "Nalu size of %zu is bigger than signaled lengthPrefixSize of %d", naluSize,
                    lengthPrefixSize);
         ilo::writeUint32(iter, end, static_cast<uint32_t>(naluSize));
         break;
       default:
         ILO_ASSERT(false, "Nalu length type of %d is not supported", lengthPrefixSize);
     }
-    std::copy(nalu.begin() + offset, nalu.end(), iter);
-    naluSample.addNalu(iter, iter + naluSize);
-    iter += naluSize;
+    auto iterEnd = std::copy(nalu.begin() + static_cast<std::ptrdiff_t>(offset), nalu.end(), iter);
+    naluSample.addNalu(iter, iterEnd);
+    iter = iterEnd;
   }
 
   ILO_ASSERT(iter == naluSample.sample.rawData.end(),
@@ -492,13 +490,16 @@ void fillNonVclNalusIntoConfigRecord(const SAvcNonVclNalus& nonVlcNalus,
         ILO_LOG_WARNING("AVC Nalu type of %d is not implemented", (nalu.at(offset) & 0x1F));
         break;
       case 7:
-        sps.push_back(ilo::ByteBuffer(nalu.begin() + offset, nalu.end()));
+        sps.push_back(
+            ilo::ByteBuffer(nalu.begin() + static_cast<std::ptrdiff_t>(offset), nalu.end()));
         break;
       case 8:
-        pps.push_back(ilo::ByteBuffer(nalu.begin() + offset, nalu.end()));
+        pps.push_back(
+            ilo::ByteBuffer(nalu.begin() + static_cast<std::ptrdiff_t>(offset), nalu.end()));
         break;
       case 13:
-        spsExt.push_back(ilo::ByteBuffer(nalu.begin() + offset, nalu.end()));
+        spsExt.push_back(
+            ilo::ByteBuffer(nalu.begin() + static_cast<std::ptrdiff_t>(offset), nalu.end()));
         break;
       default:
         ILO_ASSERT(false, "AVC Nalu type of %d is not implemented", (nalu.at(offset) & 0x1F));
@@ -521,6 +522,26 @@ void fillNonVclNalusIntoConfigRecord(const SAvcNonVclNalus& nonVlcNalus,
 void fillNonVclNalusIntoConfigRecord(const SHevcNonVclNalus& nonVclNalus,
                                      config::CHevcDecoderConfigRecord& configRecord,
                                      bool allArrayComplete) {
+  std::map<uint8_t, bool> arrayCompleteMap;
+
+  const auto& nalus = nonVclNalus.getNalus();
+  for (const auto& nalu : nalus) {
+    size_t offset = 0;
+
+    if (nonVclNalus.isAnnexB()) {
+      offset = calculateStartCodeLength(nalu);
+    }
+
+    uint8_t naluType = static_cast<uint8_t>((nalu.at(offset) & 0x7E) >> 1);
+    arrayCompleteMap[naluType] = allArrayComplete;
+  }
+
+  fillNonVclNalusIntoConfigRecord(nonVclNalus, configRecord, arrayCompleteMap);
+}
+
+void fillNonVclNalusIntoConfigRecord(const SHevcNonVclNalus& nonVclNalus,
+                                     config::CHevcDecoderConfigRecord& configRecord,
+                                     const std::map<uint8_t, bool>& arrayCompleteMap) {
   config::CHevcDecoderConfigRecord::NonVclArrays nonVclArrays;
   std::map<uint8_t, uint32_t> naluTypeToVectorIndex;
 
@@ -536,14 +557,15 @@ void fillNonVclNalusIntoConfigRecord(const SHevcNonVclNalus& nonVclNalus,
     if (naluTypeToVectorIndex.find(naluType) == naluTypeToVectorIndex.end()) {
       config::CHevcDecoderConfigRecord::SHevcArray hevcArray;
 
-      hevcArray.arrayCompleteness = allArrayComplete;
+      hevcArray.arrayCompleteness = arrayCompleteMap.at(naluType);
       hevcArray.naluType = naluType;
       nonVclArrays.push_back(hevcArray);
       naluTypeToVectorIndex[naluType] = static_cast<uint32_t>(nonVclArrays.size() - 1);
     }
 
     auto& hevcArray = nonVclArrays.at(naluTypeToVectorIndex[naluType]);
-    hevcArray.nalus.push_back(ilo::ByteBuffer(nalu.begin() + offset, nalu.end()));
+    hevcArray.nalus.push_back(
+        ilo::ByteBuffer(nalu.begin() + static_cast<std::ptrdiff_t>(offset), nalu.end()));
   }
 
   configRecord.setNonVclArrays(nonVclArrays);
@@ -552,6 +574,27 @@ void fillNonVclNalusIntoConfigRecord(const SHevcNonVclNalus& nonVclNalus,
 void fillNonVclNalusIntoConfigRecord(const SVvcNonVclNalus& nonVclNalus,
                                      config::CVvcDecoderConfigRecord& configRecord,
                                      bool allArrayComplete) {
+  std::map<uint8_t, bool> arrayCompleteMap;
+
+  const auto& nalus = nonVclNalus.getNalus();
+  for (const auto& nalu : nalus) {
+    size_t offset = 0;
+
+    if (nonVclNalus.isAnnexB()) {
+      offset = calculateStartCodeLength(nalu);
+    }
+
+    // Nalu type parsing according to ISO/IEC 23090-3 - 7.3.1.2
+    uint8_t naluType = static_cast<uint8_t>(nalu.at(offset + 1) >> 3);
+    arrayCompleteMap[naluType] = allArrayComplete;
+  }
+
+  fillNonVclNalusIntoConfigRecord(nonVclNalus, configRecord, arrayCompleteMap);
+}
+
+void fillNonVclNalusIntoConfigRecord(const SVvcNonVclNalus& nonVclNalus,
+                                     config::CVvcDecoderConfigRecord& configRecord,
+                                     const std::map<uint8_t, bool>& arrayCompleteMap) {
   config::CVvcDecoderConfigRecord::NonVclArrays nonVclArrays;
   std::map<uint8_t, uint32_t> naluTypeToVectorIndex;
 
@@ -568,14 +611,14 @@ void fillNonVclNalusIntoConfigRecord(const SVvcNonVclNalus& nonVclNalus,
     if (naluTypeToVectorIndex.find(naluType) == naluTypeToVectorIndex.end()) {
       config::CVvcDecoderConfigRecord::SVvcArray vvcArray;
 
-      vvcArray.arrayCompleteness = allArrayComplete;
+      vvcArray.arrayCompleteness = arrayCompleteMap.at(naluType);
       vvcArray.naluType = naluType;
       nonVclArrays.push_back(vvcArray);
       naluTypeToVectorIndex[naluType] = static_cast<uint32_t>(nonVclArrays.size() - 1);
     }
 
     auto& vvcArray = nonVclArrays.at(naluTypeToVectorIndex[naluType]);
-    vvcArray.nalus.emplace_back(nalu.begin() + offset, nalu.end());
+    vvcArray.nalus.emplace_back(nalu.begin() + static_cast<std::ptrdiff_t>(offset), nalu.end());
   }
 
   configRecord.setNonVclArrays(nonVclArrays);

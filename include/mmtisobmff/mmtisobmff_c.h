@@ -118,6 +118,7 @@ extern "C" {
 #else
 #include <stdint.h>
 #endif
+#include <stddef.h>
 
 #if (defined _WIN32 || defined __CYGWIN__) && defined MMTISOBMFF_BUILD_SHARED
 #ifdef __GNUC__
@@ -139,16 +140,22 @@ extern "C" {
  * The error values that can be returned
  */
 typedef enum {
-  ISOBMFF_OK = 0,               /**< No error */
-  ISOBMFF_UNKNOWN_ERR = 1,      /**< The error type is unknown */
-  ISOBMFF_PARAM_ERR = 2,        /**< The used parameter is invalid */
-  ISOBMFF_ALREADY_INIT_ERR = 3, /**< The called handle or resource is already created */
-  ISOBMFF_MEMORY_ERR = 4,       /**< The library was not able to allocate the needed memory */
-  ISOBMFF_NOT_INIT_ERR =
-      5, /**< A function was called before creating the needed handle or resource */
-  ISOBMFF_LIB_ERR =
-      6, /**< The underlying C++ library returned an error. See error log for more details. */
-  ISOBMFF_NOT_IMPL_ERR = 7 /**< Feature is not implemented */
+  /** No error */
+  ISOBMFF_OK = 0,
+  /** The error type is unknown */
+  ISOBMFF_UNKNOWN_ERR = 1,
+  /** The used parameter is invalid */
+  ISOBMFF_PARAM_ERR = 2,
+  /** The called handle or resource is already created */
+  ISOBMFF_ALREADY_INIT_ERR = 3,
+  /** The library was not able to allocate the needed memory */
+  ISOBMFF_MEMORY_ERR = 4,
+  /** A function was called before creating the needed handle or resource */
+  ISOBMFF_NOT_INIT_ERR = 5,
+  /** The underlying C++ library returned an error. See error log for more details. */
+  ISOBMFF_LIB_ERR = 6,
+  /** Feature is not implemented */
+  ISOBMFF_NOT_IMPL_ERR = 7
 } ISOBMFF_ERR;
 
 /**
@@ -159,10 +166,14 @@ typedef enum {
  * if the track type is not known by the library.
  */
 typedef enum {
-  TrackType_Undefined = 0, /**< Unknown track  */
-  TrackType_Audio,         /**< Audio track */
-  TrackType_Video,         /**< Video track */
-  TrackType_Hint           /**< Hint track */
+  /** Unknown track  */
+  TrackType_Undefined = 0,
+  /** Audio track */
+  TrackType_Audio,
+  /** Video track */
+  TrackType_Video,
+  /** Hint track */
+  TrackType_Hint
 } TrackType_C;
 
 /**
@@ -173,16 +184,25 @@ typedef enum {
  * if the codec type is not known by the library.
  */
 typedef enum {
-  Codec_Undefined = 0, /**< Unknown codec */
-  Codec_Mp4a = 4,      /**< MP4a based audio codec (AAC, HE-AAC, HE-AACv2, xHE-AAC, etc...) */
-  Codec_Mpegh_Mha,     /**< MPEG-H MHA audio codec. RAW-AU in MP4 */
-  Codec_Mpegh_Mhm,     /**< MPEG-H MHM audio codec. MHAS in MP4 */
+  /** Unknown codec */
+  Codec_Undefined = 0,
+  /** MP4a based audio codec (AAC, HE-AAC, HE-AACv2, xHE-AAC, etc...) */
+  Codec_Mp4a = 4,
+  /** MPEG-H MHA audio codec. RAW-AU in MP4 */
+  Codec_Mpegh_Mha,
+  /** MPEG-H MHM audio codec. MHAS in MP4 */
+  Codec_Mpegh_Mhm,
 
-  Codec_Mp4v = 65535, /**< MPEG4 video codecs */
-  Codec_Avc,          /**< AVC/H.264 video codec */
-  Codec_Hevc,         /**< HEVC/H.265 video codec */
-  Codec_Jxs,          /**< JPEG XS video codec */
-  Codec_Vvc           /**< VVC/H.266 video codec */
+  /** MPEG4 video codecs */
+  Codec_Mp4v = 65535,
+  /** AVC/H.264 video codec */
+  Codec_Avc,
+  /** HEVC/H.265 video codec */
+  Codec_Hevc,
+  /** JPEG XS video codec */
+  Codec_Jxs,
+  /** VVC/H.266 video codec */
+  Codec_Vvc
 } Codec_C;
 
 /**
@@ -194,11 +214,16 @@ typedef enum {
  * Sample groups are a concept to group samples together.
  */
 typedef enum {
-  SampleGroup_Undefined = 0, /**< Unknown sample group */
-  SampleGroup_None = 1,      /**< No sample group */
-  SampleGroup_Roll = 2,      /**< Sample group of type Roll-Recovery */
-  SampleGroup_Prol = 3,      /**< Sample group of type Pre-Roll */
-  SampleGroup_Sap = 4        /**< Sample group of type Stream-Access-Point */
+  /** Unknown sample group */
+  SampleGroup_Undefined = 0,
+  /** No sample group */
+  SampleGroup_None = 1,
+  /** Sample group of type Roll-Recovery */
+  SampleGroup_Roll = 2,
+  /** Sample group of type Pre-Roll */
+  SampleGroup_Prol = 3,
+  /** Sample group of type Stream-Access-Point */
+  SampleGroup_Sap = 4
 } SampleGroup_C;
 
 /**
@@ -208,14 +233,20 @@ typedef enum {
  * what is to be expected when the stream is joined at an SAP sample.
  */
 typedef enum {
-  SapTypeUnknown = 0, /**< Unknown stream access type */
-  SapType1 = 1,       /**< Indicates a sync sample (see codec standard)*/
-  SapType2 = 2,       /**< Indicates a sync sample (see codec standard)*/
-  SapType3 = 3,       /**< SAP is marked as a member of a sample group of type 'rap' */
-  SapType4 =
-      4, /**< SAP is marked as a member of a sample group of type 'roll', with roll distance > 0 */
-  SapType5 = 5, /**< No specific signalling in isobmff standard supported */
-  SapType6 = 6  /**< No specific signalling in isobmff standard supported */
+  /** Unknown stream access type */
+  SapTypeUnknown = 0,
+  /** Indicates a sync sample (see codec standard)*/
+  SapType1 = 1,
+  /** Indicates a sync sample (see codec standard)*/
+  SapType2 = 2,
+  /** SAP is marked as a member of a sample group of type 'rap' */
+  SapType3 = 3,
+  /** SAP is marked as a member of a sample group of type 'roll', with roll distance > 0 */
+  SapType4 = 4,
+  /** No specific signalling in isobmff standard supported */
+  SapType5 = 5,
+  /** No specific signalling in isobmff standard supported */
+  SapType6 = 6
 } SapType_C;
 
 /**
@@ -224,8 +255,10 @@ typedef enum {
  * Define the logging verbosity.
  */
 typedef enum {
-  LogLevelStandard = 0, /**< Default log level with less info prints */
-  LogLevelVerbose = 1   /**< Verbose log level with all info prints */
+  /** Default log level with less info prints */
+  LogLevelStandard = 0,
+  /** Verbose log level with all info prints */
+  LogLevelVerbose = 1
 } LogLevel_C;
 
 /** @name forward declarations (reading interface) */
@@ -358,7 +391,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_setLogLevel(const LogLevel_C logLevel);
  * @param [out] isobmffReader - an isobmff reader instance.
  * @param [in]  fileUri       - URI of the file to be read.
  * @returns ISOBMFF_OK if opening of the MP4 file and the initialization of the
- * reader were successful.
+ *          reader were successful.
  *
  * @note Created ISOBMFF_Reader instance must be be destroyed with @ref isobmff_destroy.
  */
@@ -376,10 +409,10 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_createFileReader(ISOBMFF_Reader** isobmffRead
  *
  * @param [out] isobmffReader - an isobmff reader instance.
  * @param [in] dataBuffer     - MP4 media segment(s) with init segment prepended at the beginning of
- * the buffer
+ *                              the buffer
  * @param [in] size           - size of the data buffer in bytes.
  * @returns ISOBMFF_OK if MP4 memory segments parsing and the initialization of the
- * reader were successful.
+ *          reader were successful.
  *
  * @note Created ISOBMFF_Reader instance must be be destroyed with @ref isobmff_destroy.
  */
@@ -421,7 +454,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getTimeScale(ISOBMFF_Reader* isobmffReader, u
  * @param [in] isobmffReader  - an isobmff reader instance.
  * @param [out] count         - count of user data entries in the track.
  * @returns ISOBMFF_OK if the count of the user data entries contained in the track was obtained
- * successfully.
+ *          successfully.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getMovieUserDataEntryCount(ISOBMFF_Reader* isobmffReader,
                                                               uint32_t* count);
@@ -431,11 +464,12 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getMovieUserDataEntryCount(ISOBMFF_Reader* is
  * @param [in] isobmffReader  - an isobmff reader instance.
  * @param [in] index          - the index of the user data entry (0-based).
  * @param [out] data          - buffer containing the user data: this buffer is formatted as an
- * isobmff box (or 'atom') specified in ISO/IEC 14496-12, Clause 4.2: 'size' [4 bytes] - 'type' (aka
- * Fourcc) [4 bytes] - payload ['size' bytes - 8]
- *                              \b Note: 'size' is a big-endian unsigned integer.
+ *                              isobmff box (or 'atom') specified in ISO/IEC 14496-12, Clause 4.2:
+ *                              - 'size' [4 bytes] (big-endian unsigned integer)
+ *                              - 'type' (aka Fourcc) [4 bytes]
+ *                              - 'payload' ['size' bytes - 8]
  * @param [out] size          - the size of the data buffer (same as the 'size' stored at the
- * beginning of 'data').
+ *                              beginning of 'data').
  * @returns ISOBMFF_OK if the user data was obtained successfully.
  *
  * @note The memory for the data pointer returned is managed by the library and shall not be freed
@@ -449,13 +483,14 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getMovieUserDataEntryByIndex(ISOBMFF_Reader* 
  *
  * @param [in] isobmffReader                 - an isobmff reader instance.
  * @param [out] audioProfileLevelIndication  - the audioProfileLevelIndication stored in the 'iods'
- * box.
+ *                                             box.
  * @param [out] isValid                      - a value of 1 indicates that 'iods' box exists and the
- * returned audioProfileLevelIndication is valid.
- *                                           - a value of 0 indicated that 'iods' box does not exist
- * and the returned audioProfileLevelIndication is invalid (not existing).
+ *                                             returned audioProfileLevelIndication is valid.
+ *                                             a value of 0 indicated that 'iods' box does not exist
+ *                                             and the returned audioProfileLevelIndication is
+ *                                             invalid (not existing).
  * @returns ISOBMFF_OK if the AudioProfileLevelIndication was obtained successfully or there was no
- * 'iods' box.
+ *          'iods' box.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getIodsAudioProfileLevelIndication(
     ISOBMFF_Reader* isobmffReader, uint8_t* audioProfileLevelIndication, uint8_t* isValid);
@@ -502,7 +537,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getCompatibleBrand(ISOBMFF_Reader* isobmffRea
  *
  * @param [in]  isobmffReader - an isobmff reader instance.
  * @param [out] trackReader   - a track reader object that provides all the track related
- * functionality.
+ *                              functionality.
  * @param [in]  trackIndex    - track index (0-based).
  * @returns ISOBMFF_OK if the track was obtained successfully.
  *
@@ -663,11 +698,12 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getTrackUserDataEntryCount(TrackReader* track
  * @param [in] trackReader - a track reader object.
  * @param [in] index       - the index of the user data entry (0-based).
  * @param [out] data       - buffer containing the user data: this buffer is formatted as a isobmff
- * box (or 'atom') specified in ISO/IEC 14496-12, Clause 4.2: 'size' [4 bytes] - 'type' (aka Fourcc)
- * [4 bytes] - payload ['size' - 8 bytes]
- *                           \b Note: 'size' is a big-endian unsigned integer.
+ *                           box (or 'atom') specified in ISO/IEC 14496-12, Clause 4.2:
+ *                             - 'size' [4 bytes] (big-endian unsigned integer)
+ *                             - 'type' (aka Fourcc) [4 bytes]
+ *                             - 'payload' ['size' bytes - 8]
  * @param [out] size       - the size of the data buffer (same as the 'size' stored at the beginning
- * of 'data').
+ *                           of 'data').
  * @returns ISOBMFF_OK if the user data was obtained successfully.
  *
  * @note The memory for the data pointer returned is managed by the library and shall not be freed
@@ -682,7 +718,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getTrackUserDataEntryByIndex(TrackReader* tra
  * @param [in]  trackReader   - a track reader object.
  * @param [out] ludtInitData  - initial 'ludt' loudness data.
  * @param [out] size          - size of the initial 'ludt' loudness data. A size 0 indicates that
- * there is no initial 'ludt' data found on movie level for this track
+ *                              there is no initial 'ludt' data found on movie level for this track
  * @returns ISOBMFF_OK if the initial 'ludt' loudness data was obtained successfully.
  *
  * @note The memory for the ludtInitData pointer returned is managed by the library and shall not be
@@ -698,7 +734,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getInitLudtData(TrackReader* trackReader, uin
  *
  * @param [in] trackReader     - a track reader object.
  * @param [out] hasLudtUpdates - If 1, 'ludt' updates are available via fragments.
- * If 0, no updates are available for this track.
+ *                               If 0, no updates are available for this track.
  * @returns ISOBMFF_OK if the value of hasLudtUpdates was obtained successfully.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_hasLudtUpdates(TrackReader* trackReader,
@@ -711,10 +747,11 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_hasLudtUpdates(TrackReader* trackReader,
  *
  * @param [in]  trackReader      - a track reader object.
  * @param [in]  fragmentNum      - Fragment number. The fragmentNum can be retrieved from the
- * sample. It is enough to issue a request once for each new fragment number.
+ *                                 sample. It is enough to issue a request once for each new
+ *                                 fragment number.
  * @param [out] fragmentLudtData - fragment 'ludt' loudness data
  * @param [out] size             - Size of the 'ludt' loudness data. If size is 0, there is no
- * 'ludt' data found on fragment level for this track.
+ *                                 'ludt' data found on fragment level for this track.
  * @returns ISOBMFF_OK if the 'ludt' loudness data from a specific fragment of a track was obtained
  * successfully.
  *
@@ -740,8 +777,8 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getDecoderSpecificConfig(TrackReader* trackRe
 /**
  * @brief Gets the 3 character language type of the track
  *
- * @param [in] trackReader    - a track reader object.
- * @param [out] trackLanguage - language of this track
+ * @param [in] trackReader         - a track reader object.
+ * @param [out] trackLanguage      - language of this track
  * @param [out] trackLanguageSize  - size in bytes of the language string
  * @returns ISOBMFF_OK if the track language string was obtained successfully.
  *
@@ -778,7 +815,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getAudioChannelCount(TrackReader* trackReader
  *
  * @param [in] trackReader          - a track reader object.
  * @param [out] mp4aAudioMaxBitrate - maximum audio bitrate value in bits per second of the encoded
- * data
+ *                                    data
  * @returns ISOBMFF_OK if the maximum audio bitrate was obtained successfully.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getDcrMp4aAudioMaxBitrate(TrackReader* trackReader,
@@ -790,7 +827,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getDcrMp4aAudioMaxBitrate(TrackReader* trackR
  *
  * @param [in] trackReader          - a track reader object.
  * @param [out] mp4aAudioAvgBitrate - average audio bitrate value in bits per second of the encoded
- * data
+ *                                    data
  * @returns ISOBMFF_OK if the average audio bitrate was obtained successfully.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getDcrMp4aAudioAvgBitrate(TrackReader* trackReader,
@@ -803,7 +840,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getDcrMp4aAudioAvgBitrate(TrackReader* trackR
  *
  * @param [in] trackReader            - a track reader object.
  * @param [out] mp4aAudioBufferSizeDb - the size of the decoding buffer for the elementary stream in
- * bytes (ISO/IEC 14496-1).
+ *                                      bytes (ISO/IEC 14496-1).
  * @returns ISOBMFF_OK if the buffer size DB was obtained successfully.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getDcrMp4aAudioBufferSizeDb(TrackReader* trackReader,
@@ -854,7 +891,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_createIodsConfig(IodsConfig** iodsConfig);
  * @brief Sets the audio profile level indication.
  *
  * @see isobmff_createIodsConfig
- * @param [in] iodsConfig - an iods config object.
+ * @param [in] iodsConfig                  - an iods config object.
  * @param [in] audioProfileLevelIndication - value of the audio profile and level indication
  * @returns ISOBMFF_OK if the major brand was set successfully.
  */
@@ -1012,11 +1049,13 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_setSidxConfig(MovieConfig* movieConfig,
  * @see isobmff_createMovieConfig
  * @param [in] movieConfig   - a movie config object.
  * @param [in] data          - buffer containing the user data: this buffer is expected to be
- * formatted as a isobmff box (or 'atom') specified in ISO/IEC 14496-12, Clause 4.2: 'size' [4
- * bytes] - 'type' (aka Fourcc) [4 bytes] - payload ['size' - 8 bytes]
- *                             \b Note: 'size' is a big-endian unsigned integer.
+ *                             formatted as a isobmff box (or 'atom') specified in ISO/IEC 14496-12,
+ *                             Clause 4.2:
+ *                               - 'size' [4 bytes] (big-endian unsigned integer)
+ *                               - 'type' (aka Fourcc) [4 bytes]
+ *                               - 'payload' ['size' bytes - 8]
  * @param [in] size          - the size of the data buffer (same as the 'size' stored at the
- * beginning of 'data').
+ *                             beginning of 'data').
  * @returns ISOBMFF_OK if the user data was successfully added to the movie config.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_addMovieUserDataEntry(MovieConfig* movieConfig,
@@ -1327,7 +1366,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_setDcrAvgBitrate(Mp4aDecoderConfigRecord* mp4
  * @brief Sets the decoder config record buffer size db value.
  *
  * @see isobmff_createMp4aDecoderConfigRecord
- * @param [in] mp4aDcr    - an mp4a decoder config record object.
+ * @param [in] mp4aDcr      - an mp4a decoder config record object.
  * @param [in] bufferSizeDB - the decoder config record buffer size db value.
  * @returns ISOBMFF_OK if the decoder config record buffer size db value was set successfully.
  */
@@ -1556,7 +1595,7 @@ isobmff_setMpeghMultiStreamConfig(TrackConfig* trackConfig, const MpeghMultiStre
  * levels. The function can be called multiple times to add more compatible set indications to the
  * list.
  * @see isobmff_createTrackConfig
- * @param [in] trackConfig - a track config object.
+ * @param [in] trackConfig     - a track config object.
  * @param [in] PLcompatibleSet - the compatible profile and level.
  * @returns ISOBMFF_OK if the compatible profile and level was successfully added to the set.
  */
@@ -1609,11 +1648,13 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_addEditListEntry(TrackWriter* trackWriter,
  * @see isobmff_createTrackWriter
  * @param [in] trackWriter   - a track writer instance.
  * @param [in] data          - buffer containing the user data: this buffer is expected to be
- * formatted as a isobmff box (or 'atom') specified in ISO/IEC 14496-12, Clause 4.2: 'size' [4
- * bytes] - 'type' (aka 4cc) [4 bytes] - payload ['size' - 8 bytes]
- *                             \b Note: 'size' is a big-endian unsigned integer.
+ *                             formatted as a isobmff box (or 'atom') specified in ISO/IEC 14496-12,
+ *                             Clause 4.2:
+ *                               - 'size' [4 bytes] (big-endian unsigned integer)
+ *                               - 'type' (aka Fourcc) [4 bytes]
+ *                               - 'payload' ['size' bytes - 8]
  * @param [in] size          - the size of the data buffer (same as the 'size' stored at the
- * beginning of 'data').
+ *                             beginning of 'data').
  * @returns ISOBMFF_OK if the user data was successfully added to the track.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_addTrackUserDataEntry(TrackWriter* trackWriter,
@@ -1727,8 +1768,9 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getSampleSyncFlag(Sample* sample, uint8_t* is
  * @see isobmff_createSample
  * @param [in]  sample          - an isobmff sample.
  * @param [out] sampleGroupType - the sample group type.
- * @param [out] value    - for type roll/prol the value parameter is the roll-distance value (as
- * signed type), for sap it is the sap-type (as 8bit unsigned type)
+ * @param [out] value           - for type roll/prol the value parameter is the roll-distance
+ *                                value (as signed type), for sap it is the sap-type
+ *                                (as 8bit unsigned type)
  * @returns ISOBMFF_OK if  sample group and value were obtained successfully.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_getSampleGroup(Sample* sample, SampleGroup_C* sampleGroupType,
@@ -1785,7 +1827,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_setSampleFragmentNum(Sample* sample,
  * @see isobmff_createSample
  * @param [in] sample       - an isobmff sample.
  * @param [in] isSyncSample - the flag to determine if a sample is a sync sample.
- * The only two allowed values are 0 and 1.
+ *                            The only two allowed values are 0 and 1.
  * @returns ISOBMFF_OK if the synch sample flag was set successfully.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_setSampleSyncFlag(Sample* sample, const uint8_t isSyncSample);
@@ -1795,8 +1837,9 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_setSampleSyncFlag(Sample* sample, const uint8
  * @see isobmff_createSample
  * @param [in] sample          - an isobmff sample.
  * @param [in] sampleGroupType - the sample group type.
- * @param [in] value    - for type roll/prol the value parameter is the roll-distance value (as
- * signed type), for sap it is the sap-type (as 8bit unsigned type)
+ * @param [in] value           - for type roll/prol the value parameter is the roll-distance
+ *                               value (as signed type), for sap it is the sap-type
+ *                               (as 8bit unsigned type)
  * @returns ISOBMFF_OK if the movie config object was successfully created.
  */
 MMTISOBMFF_DLL ISOBMFF_ERR isobmff_setSampleGroup(Sample* sample,
@@ -1861,7 +1904,7 @@ MMTISOBMFF_DLL ISOBMFF_ERR isobmff_createMovieConfigFromReader(ISOBMFF_Reader* i
  * @see isobmff_getTrack
  * @see isobmff_createTrackWriter
  * @see isobmff_destroyTrackConfig
- * @param [in] trackReader - a track reader object.
+ * @param [in] trackReader  - a track reader object.
  * @param [out] trackConfig - a track config object.
  * @returns ISOBMFF_OK if track config object was created successfully.
  */

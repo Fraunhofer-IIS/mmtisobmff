@@ -92,8 +92,6 @@ amm-info@iis.fraunhofer.de
 
 // System includes
 #include <string>
-#include <fstream>
-#include <stdexcept>
 
 #include <stdio.h>
 
@@ -167,13 +165,7 @@ struct CIsobmffFileInput : public IIsobmffInput {
    * @note begin and end iterators must both point to the same underlying buffer structure
    * and memory must be accessible in a continuous way.
    */
-  virtual size_t read(ilo::ByteBuffer::iterator inBegin, ilo::ByteBuffer::iterator inEnd) override {
-    size_t len = static_cast<size_t>(inEnd - inBegin);
-    char* buffer = reinterpret_cast<char*>(&(*inBegin));
-    size_t actuallyRead = fread(buffer, sizeof(uint8_t), len, m_file.get());
-
-    return actuallyRead;
-  }
+  virtual size_t read(ilo::ByteBuffer::iterator inBegin, ilo::ByteBuffer::iterator inEnd) override;
 
   /*!
    * @brief Function to seek to a fixed position in the input file
@@ -183,13 +175,7 @@ struct CIsobmffFileInput : public IIsobmffInput {
    * @param pos Position in bytes relative to file start at which to continue reading with the next
    * @ref read call.
    */
-  virtual void seek(pos_type pos) override {
-    int err = ilo_fseeko(m_file.get(), pos, SEEK_SET);
-
-    if (err != 0) {
-      throw std::runtime_error("Could not seek to position");
-    }
-  }
+  virtual void seek(pos_type pos) override;
 
   /*!
    * @brief Function to seek relative to a given origin
@@ -202,35 +188,13 @@ struct CIsobmffFileInput : public IIsobmffInput {
    *              a negative value seeking towards the front.
    * @param origin Origin to start seeking at.
    */
-  virtual void seek(offset_type offset, SeekingOrigin origin) override {
-    int err = 0;
-
-    switch (origin) {
-      case SeekingOrigin::beg:
-        seek((pos_type)offset);
-        break;
-      case SeekingOrigin::end:
-        err = ilo_fseeko(m_file.get(), offset, SEEK_END);
-        break;
-      case SeekingOrigin::cur:
-        err = ilo_fseeko(m_file.get(), offset, SEEK_CUR);
-        break;
-    }
-
-    if (err != 0) {
-      throw std::runtime_error("Could not seek to position");
-    }
-  }
+  virtual void seek(offset_type offset, SeekingOrigin origin) override;
 
   //! Function to get the current position in the stream
   virtual pos_type tell() override { return static_cast<pos_type>(ilo_ftello(m_file.get())); }
 
   //! Function to check if input is "end of input"
-  virtual bool isEOI() override {
-    auto c = fgetc(m_file.get());
-    ungetc(c, m_file.get());
-    return feof(m_file.get()) != 0;
-  }
+  virtual bool isEOI() override;
 
   //! Clones the input
   virtual std::unique_ptr<IIsobmffInput> clone() override {
@@ -272,15 +236,7 @@ struct CIsobmffMemoryInput : public IIsobmffInput {
    * @note begin and end iterators must both point to the same underlying buffer structure
    * and memory must be accessible in a continuous way.
    */
-  virtual size_t read(ilo::ByteBuffer::iterator inBegin, ilo::ByteBuffer::iterator inEnd) override {
-    auto copyCount =
-        std::min(static_cast<size_t>(inEnd - inBegin), static_cast<size_t>(buffer->end() - ptr));
-
-    std::copy(ptr, ptr + copyCount, inBegin);
-
-    ptr += copyCount;
-    return copyCount;
-  }
+  virtual size_t read(ilo::ByteBuffer::iterator inBegin, ilo::ByteBuffer::iterator inEnd) override;
 
   /*!
    * @brief Function to seek to a fixed position in the input buffer
@@ -290,12 +246,7 @@ struct CIsobmffMemoryInput : public IIsobmffInput {
    * @param pos Position in bytes relative to buffer begin at which to continue reading with the
    * next @ref read call.
    */
-  virtual void seek(pos_type pos) override {
-    if (pos > buffer->size()) {
-      throw std::out_of_range("Position to seek to is out of range");
-    }
-    ptr = buffer->begin() + static_cast<ilo::ByteBuffer::difference_type>(pos);
-  }
+  virtual void seek(pos_type pos) override;
 
   /*!
    * @brief Function to seek relative to a given origin
@@ -308,30 +259,7 @@ struct CIsobmffMemoryInput : public IIsobmffInput {
    *              a negative value seeking towards the front.
    * @param origin Origin to start seeking at.
    */
-  virtual void seek(offset_type offset, SeekingOrigin origin) override {
-    switch (origin) {
-      case SeekingOrigin::beg:
-        seek((pos_type)offset);
-        break;
-      case SeekingOrigin::end:
-        if (offset > 0 || buffer->size() < static_cast<uint64_t>(std::abs(offset))) {
-          throw std::out_of_range("Position to seek to is out of range");
-        }
-        ptr = buffer->end() + static_cast<ilo::ByteBuffer::difference_type>(offset);
-        break;
-      case SeekingOrigin::cur:
-        if (offset > 0 && offset > (buffer->end() - ptr)) {
-          throw std::out_of_range("Position to seek to is out of range");
-        }
-
-        if (offset < 0 && offset < (buffer->begin() - ptr)) {
-          throw std::out_of_range("Position to seek to is out of range");
-        }
-
-        ptr += static_cast<ilo::ByteBuffer::difference_type>(offset);
-        break;
-    }
-  }
+  virtual void seek(offset_type offset, SeekingOrigin origin) override;
 
   //! Function to get the current reading position in the stream in bytes
   virtual pos_type tell() override { return static_cast<pos_type>(ptr - buffer->begin()); }

@@ -277,7 +277,7 @@ void setupMpegh(std::weak_ptr<CIsobmffWriter::Pimpl> writerPimpl,
   wPimpl->fillStaticMoovInfo();
 }
 
-/* ######---MPEGH Track Writer---###### */
+/* ######---MPEG-H Track Writer---###### */
 CMpeghTrackWriter::CMpeghTrackWriter(std::weak_ptr<CIsobmffWriter::Pimpl> writerPimpl,
                                      const SMpeghMhm1TrackConfig& config)
     : CTrackWriter(writerPimpl, config) {
@@ -378,7 +378,7 @@ void CAvcTrackWriter::addSample(const SAvcNalus& nalus) {
   ILO_ASSERT(m_decoderConfigRecord, "Stored config record is a zero pointer");
   SAvcSample sample;
   tools::convertGeneralVideoNalusToVideoSample(
-      nalus, m_decoderConfigRecord->lengthSizeMinusOne() + 1, sample);
+      nalus, static_cast<uint8_t>(m_decoderConfigRecord->lengthSizeMinusOne() + 1U), sample);
   addSample(sample.sample);
 }
 
@@ -425,7 +425,7 @@ void CHevcTrackWriter::addSample(const SHevcNalus& nalus) {
   ILO_ASSERT(m_decoderConfigRecord, "Stored config record is a zero pointer");
   SHevcSample sample;
   tools::convertGeneralVideoNalusToVideoSample(
-      nalus, m_decoderConfigRecord->lengthSizeMinusOne() + 1, sample);
+      nalus, static_cast<uint8_t>(m_decoderConfigRecord->lengthSizeMinusOne() + 1U), sample);
   addSample(sample.sample);
 }
 
@@ -514,7 +514,7 @@ void CVvcTrackWriter::addSample(const SVvcNalus& nalus) {
   ILO_ASSERT(m_decoderConfigRecord, "Stored config record is a zero pointer");
   SVvcSample sample;
   tools::convertGeneralVideoNalusToVideoSample(
-      nalus, m_decoderConfigRecord->lengthSizeMinusOne() + 1, sample);
+      nalus, static_cast<uint8_t>(m_decoderConfigRecord->lengthSizeMinusOne() + 1U), sample);
   addSample(sample.sample);
 }
 }  // namespace isobmff

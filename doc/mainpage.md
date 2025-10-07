@@ -80,7 +80,6 @@ SMpeghMhm1TrackConfig mhm1Config;
 std::unique_ptr<CMpeghTrackWriter> mhm1TrackWriter =
       fileWriter->trackWriter<CMpeghTrackWriter>(mhm1Config);
 
-
 CSample sample;
 // Fill sample with MHAS data
 

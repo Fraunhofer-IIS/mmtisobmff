@@ -138,7 +138,7 @@ void CHandlerReferenceBox::parseBox(ilo::ByteBuffer::const_iterator& begin,
     }
   }
 
-  m_name = ilo::readStringNonStrict(begin, end, end - begin);
+  m_name = ilo::readStringNonStrict(begin, end, static_cast<size_t>(end - begin));
 
   if (end != begin) {
     ILO_LOG_WARNING("Malformed handler name found in %s: skipping remaining bytes.",

@@ -145,7 +145,8 @@ struct CEditListExtractor {
       ti.editList.push_back(sedit);
 
       if (edit.mediaRateFraction != 0) {
-        ILO_LOG_WARNING("Invalid mediaRateFraction of %d in edit list found");
+        ILO_LOG_WARNING("Invalid mediaRateFraction of %d in edit list found",
+                        edit.mediaRateFraction);
       }
     }
   }

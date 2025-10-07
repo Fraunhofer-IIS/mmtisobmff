@@ -92,8 +92,6 @@ amm-info@iis.fraunhofer.de
 
 // System includes
 #include <string>
-#include <stdexcept>
-#include <stdio.h>
 #include <cstdlib>
 
 // External includes
@@ -167,21 +165,7 @@ struct CIsobmffFileOutput : public IIsobmffOutput {
    * The amount of data is specified by the range between the begin and end iterator of the buffer.
    */
   virtual void write(const ilo::ByteBuffer::const_iterator& inBegin,
-                     const ilo::ByteBuffer::const_iterator& inEnd) override {
-    if (inBegin >= inEnd) {
-      throw std::out_of_range("Buffer iterator inBegin must be smaller inEnd when writing");
-    }
-
-    size_t len = static_cast<size_t>(inEnd - inBegin);
-    const char* buffer = reinterpret_cast<const char*>(&(*inBegin));
-    size_t actuallyWritten = fwrite(buffer, sizeof(uint8_t), len, m_file.get());
-
-    if (actuallyWritten != len) {
-      throw std::runtime_error("Could not write complete buffer to file. Maybe the disc is full?");
-    }
-
-    m_fileStreamSize += actuallyWritten;
-  }
+                     const ilo::ByteBuffer::const_iterator& inEnd) override;
 
   /*!
    * @brief Read data back from the current open write handle.
@@ -192,39 +176,7 @@ struct CIsobmffFileOutput : public IIsobmffOutput {
    * @note Only possible for writing mode 'modeWriteExtended'. Reading will not alter the write
    * pointer. Will throw an exception if 'modeWriteExended' is disabled.
    */
-  virtual ilo::CUniqueBuffer read(size_t offset = 0, size_t size = 0) override {
-    if (!m_modeExtended) {
-      throw std::invalid_argument(
-          "Reading back data from the file output"
-          " module is only possible with modeWriteExtended");
-    }
-
-    // Save old position (read operation shall not modify the write state)
-    auto oldPos = tell();
-
-    // Seek to target offset
-    seek(offset, SeekingOrigin::beg);
-
-    // Hint: Also check for uint64_t overflow since we are adding two uint64_t values.
-    if (offset + size > m_fileStreamSize || offset + size < offset || offset + size < size) {
-      throw std::out_of_range(
-          "Provided offset and size values to read back data exceed the file size");
-    }
-
-    auto buffer = ilo::make_unique<ilo::ByteBuffer>(
-        (size == 0) ? (static_cast<size_t>(m_fileStreamSize - offset)) : size);
-
-    size_t dataRead = fread(buffer.get()->data(), sizeof(uint8_t), buffer->size(), m_file.get());
-
-    if (dataRead != (sizeof(uint8_t) * buffer->size())) {
-      throw std::runtime_error("Could not read all data from output module");
-    }
-
-    // Restore old position
-    seek(oldPos, SeekingOrigin::beg);
-
-    return buffer;
-  }
+  virtual ilo::CUniqueBuffer read(size_t offset = 0, size_t size = 0) override;
 
   /*!
    * @brief Function to seek to a fixed position in the output file
@@ -234,13 +186,7 @@ struct CIsobmffFileOutput : public IIsobmffOutput {
    * @param pos Position in bytes relativ to file start at which to continue writing with the next
    * @ref write call
    */
-  virtual void seek(pos_type pos) override {
-    int err = ilo_fseeko(m_file.get(), pos, SEEK_SET);
-
-    if (err != 0) {
-      throw std::runtime_error("Could not seek to position");
-    }
-  }
+  virtual void seek(pos_type pos) override;
 
   /*!
    * @brief Function to seek relative to a given origin
@@ -253,25 +199,7 @@ struct CIsobmffFileOutput : public IIsobmffOutput {
    *              a negative value seeking towards the front.
    * @param origin Origin to start seeking at
    */
-  virtual void seek(offset_type offset, SeekingOrigin origin) override {
-    int err = 0;
-
-    switch (origin) {
-      case SeekingOrigin::beg:
-        seek((pos_type)offset);
-        break;
-      case SeekingOrigin::end:
-        err = ilo_fseeko(m_file.get(), offset, SEEK_END);
-        break;
-      case SeekingOrigin::cur:
-        err = ilo_fseeko(m_file.get(), offset, SEEK_CUR);
-        break;
-    }
-
-    if (err != 0) {
-      throw std::runtime_error("Could not seek to position");
-    }
-  }
+  virtual void seek(offset_type offset, SeekingOrigin origin) override;
 
   //! Function to get the current writing position in the stream in bytes
   virtual pos_type tell() override { return static_cast<pos_type>(ilo_ftello(m_file.get())); }
@@ -306,19 +234,7 @@ struct CIsobmffMemoryOutput : IIsobmffOutput {
    * The amount of data is specified by the range between the begin and end iterator of the buffer.
    */
   virtual void write(const ilo::ByteBuffer::const_iterator& inBegin,
-                     const ilo::ByteBuffer::const_iterator& inEnd) override {
-    auto toWrite = static_cast<size_t>(inEnd - inBegin);
-    auto availableSpace = static_cast<size_t>(buffer.end() - ptr);
-
-    if (toWrite > availableSpace) {
-      buffer.resize(buffer.size() + toWrite - availableSpace);
-      ptr = buffer.end() - toWrite;
-    }
-
-    std::copy(inBegin, inEnd, ptr);
-
-    ptr += toWrite;
-  }
+                     const ilo::ByteBuffer::const_iterator& inEnd) override;
 
   /*!
    * @brief Read data from the buffer
@@ -332,18 +248,7 @@ struct CIsobmffMemoryOutput : IIsobmffOutput {
    * @note Read does not store the last read position. It always operates on the given
    * offset relative to the start of the buffer.
    */
-  virtual ilo::CUniqueBuffer read(size_t offset = 0, size_t size = 0) override {
-    if (offset + size > buffer.size() || offset + size < offset || offset + size < size) {
-      throw std::out_of_range("Requested byte range is not available");
-    }
-
-    if (size == 0) {
-      return ilo::make_unique<ilo::ByteBuffer>(buffer.begin() + offset, buffer.end());
-    } else {
-      return ilo::make_unique<ilo::ByteBuffer>(buffer.begin() + offset,
-                                               buffer.begin() + offset + size);
-    }
-  }
+  virtual ilo::CUniqueBuffer read(size_t offset = 0, size_t size = 0) override;
 
   /*!
    * @brief Function to seek to a fixed position in the output buffer
@@ -353,12 +258,7 @@ struct CIsobmffMemoryOutput : IIsobmffOutput {
    * @param pos Position in bytes relative to buffer start at which to continue writing with the
    * next @ref write call.
    */
-  virtual void seek(pos_type pos) override {
-    if (pos > buffer.size()) {
-      throw std::out_of_range("Position to seek to is out of range");
-    }
-    ptr = buffer.begin() + static_cast<ilo::ByteBuffer::difference_type>(pos);
-  }
+  virtual void seek(pos_type pos) override;
 
   /*!
    * @brief Function to seek relative to a given origin
@@ -371,30 +271,7 @@ struct CIsobmffMemoryOutput : IIsobmffOutput {
    *              a negative value seeking towards the front.
    * @param origin Origin to start seeking at
    */
-  virtual void seek(offset_type offset, SeekingOrigin origin) override {
-    switch (origin) {
-      case SeekingOrigin::beg:
-        seek((pos_type)offset);
-        break;
-      case SeekingOrigin::end:
-        if (offset > 0 || buffer.size() < static_cast<uint64_t>(std::abs(offset))) {
-          throw std::out_of_range("Position to seek to is out of range");
-        }
-        ptr = buffer.end() + static_cast<ilo::ByteBuffer::difference_type>(offset);
-        break;
-      case SeekingOrigin::cur:
-        if (offset > 0 && offset > (buffer.end() - ptr)) {
-          throw std::out_of_range("Position to seek to is out of range");
-        }
-
-        if (offset < 0 && offset < (buffer.begin() - ptr)) {
-          throw std::out_of_range("Position to seek to is out of range");
-        }
-
-        ptr += static_cast<ilo::ByteBuffer::difference_type>(offset);
-        break;
-    }
-  }
+  virtual void seek(offset_type offset, SeekingOrigin origin) override;
 
   //! Function to get the current writing position in the stream in bytes
   virtual pos_type tell() override { return static_cast<pos_type>(ptr - buffer.begin()); }

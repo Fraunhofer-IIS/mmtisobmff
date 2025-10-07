@@ -86,6 +86,7 @@ amm-info@iis.fraunhofer.de
  */
 
 // System includes
+#include <cinttypes>
 #include <ios>
 #include <string>
 #include <cmath>
@@ -138,17 +139,17 @@ BoxSizeType CBoxReader::readBoxHeaderFields(ilo::ByteBuffer& buffer) const {
     boxSizeType.size = (size_t)(endPos - currentPos + buffer.size());
   } else if (boxSizeType.size == 1) {
     buffer.resize(buffer.size() + EXTRA_EXTENSION_HEADER);
-    iter = buffer.begin() + BASIC_HEADER_SIZER;
-    ILO_ASSERT(
-        input->read(buffer.begin() + BASIC_HEADER_SIZER, buffer.end()) == EXTRA_EXTENSION_HEADER,
-        "Header signals 64bit box extension, but buffer is too small to contain extension size "
-        "field");
+    iter = buffer.begin() + static_cast<std::ptrdiff_t>(BASIC_HEADER_SIZER);
+    ILO_ASSERT(input->read(buffer.begin() + static_cast<std::ptrdiff_t>(BASIC_HEADER_SIZER),
+                           buffer.end()) == EXTRA_EXTENSION_HEADER,
+               "Header signals 64bit box extension, but buffer is too small to contain extension "
+               "size field");
     boxSizeType.size = ilo::readUint64(buffer, iter);
   }
   boxSizeType.headerLengthInBytes = static_cast<uint32_t>(buffer.size());
 
   if (verboseLogLevel) {
-    ILO_LOG_SCOPE("type: %s, size: % " PRIu64 "bytes", ilo::toString(boxSizeType.type).c_str(),
+    ILO_LOG_SCOPE("type: %s, size: %" PRIu64 "bytes", ilo::toString(boxSizeType.type).c_str(),
                   boxSizeType.size);
   }
   return boxSizeType;
@@ -167,20 +168,20 @@ BoxSizeType CBoxReader::readBoxRemainder(ilo::ByteBuffer& buffer,
 
   auto availableByteCount = inputBytesReadable(input);
   if (toRead > availableByteCount) {
-    ILO_LOG_WARNING("box truncated in input: type %s, size %udd (available: %udd)",
+    ILO_LOG_WARNING("box truncated in input: type %s, size %" PRIu64 " (available: %" PRIu64 ")",
                     ilo::toString(boxSizeType.type).c_str(), boxSizeType.size, availableByteCount);
     toRead = availableByteCount;
   }
 
   if (boxSizeType.type == ilo::toFcc("mdat") && m_skipMdatPayload) {
-    input->seek(toRead, SeekingOrigin::cur);
+    input->seek(static_cast<offset_type>(toRead), SeekingOrigin::cur);
     return boxSizeType;
   }
 
   buffer.resize(buffer.size() + static_cast<size_t>(toRead));
 
-  size_t remainingRead =
-      input->read(buffer.begin() + boxSizeType.headerLengthInBytes, buffer.end());
+  size_t remainingRead = input->read(
+      buffer.begin() + static_cast<std::ptrdiff_t>(boxSizeType.headerLengthInBytes), buffer.end());
   ILO_ASSERT(static_cast<uint64_t>(remainingRead) == toRead,
              "Failed to read box payload. Not enough data to read.");
 

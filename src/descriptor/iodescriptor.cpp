@@ -112,7 +112,7 @@ CIODescriptor::CIODescriptor(ilo::ByteBuffer::const_iterator& begin,
       m_audioProfileLevelIndication(0),
       m_visualProfileLevelIndication(0),
       m_graphicsProfileLevelIndication(0) {
-  CIODescriptor::parse(begin, begin + size());
+  CIODescriptor::parse(begin, begin + static_cast<std::ptrdiff_t>(size()));
 }
 
 CIODescriptor::CIODescriptor(const SIODescriptorWriteConfig& descriptorData)
@@ -223,7 +223,7 @@ void CIODescriptor::updateSize(uint32_t sizeValue) {
   sizeValue += 2;  // ObjectDescriptorID, URLflag, includeInlineProfileLevelFlag, reserved
 
   if (m_URLflag) {
-    sizeValue += (1 + m_URLlength);  // URLlength, URLstring[URLlength]
+    sizeValue += (1U + m_URLlength);  // URLlength, URLstring[URLlength]
   } else {
     sizeValue += 1;  // ODProfileLevelIndication;
     sizeValue += 1;  // sceneProfileLevelIndication;
@@ -292,11 +292,10 @@ void CIODescriptor::writeDescriptor(ilo::ByteBuffer& buffer,
   ILO_ASSERT_WITH(static_cast<size_t>(buffer.end() - position) >= size(), std::logic_error,
                   "CIODescriptor: not enough space in buffer");
 
-  uint16_t tmp = 0;
-  tmp = static_cast<uint8_t>(m_objectDescriptorId << 6);
-  tmp |= (m_URLflag << 5);
-  tmp |= (m_includeInlineProfileLevelFlag << 4);
-  tmp |= 0x000F;
+  uint16_t tmp = static_cast<uint8_t>(m_objectDescriptorId << 6);
+  tmp = static_cast<uint16_t>(tmp | (m_URLflag << 5));
+  tmp = static_cast<uint16_t>(tmp | (m_includeInlineProfileLevelFlag << 4));
+  tmp = static_cast<uint16_t>(tmp | 0x000F);
 
   writeUint16(buffer, position, tmp);
 

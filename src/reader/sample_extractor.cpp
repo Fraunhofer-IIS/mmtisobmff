@@ -334,7 +334,7 @@ void CFragmentedSampleExtractor::fillSampleInfoTable(uint64_t dataOffset) {
     setSampleSampleGroupInfoFrag(index, metaSample);
 
     currentSampleOffset += metaSample.size;
-    metaSample.dtsValue = currentDtsValue;
+    metaSample.dtsValue = static_cast<int64_t>(currentDtsValue);
     currentDtsValue += metaSample.duration;
     (*m_sampleInfoTable)[m_currentTfhdBox->trackId()].push_back(metaSample);
   }
@@ -384,7 +384,7 @@ void CFragmentedSampleExtractor::setSampleOffset(uint64_t dataOffset, uint64_t c
   metaSample.offset = dataOffset + currentSampleOffset;
 
   if (m_currentTrunBox->dataOffsetPresent()) {
-    metaSample.offset += m_currentTrunBox->dataOffset();
+    metaSample.offset += static_cast<uint64_t>(m_currentTrunBox->dataOffset());
   }
 }
 
@@ -507,7 +507,7 @@ void CRegularSampleExtractor::setSampleDurations(const uint32_t& trackId, const 
   auto stts = findFirstBoxWithType<box::CDecodingTimeToSampleBox>(node);
   ILO_ASSERT(stts != nullptr, "no stts box found");
   size_t totalSampleCount = 0;
-  uint64_t currentDtsValue = 0;
+  int64_t currentDtsValue = 0;
   const size_t sampleInfoEntries = (*m_sampleInfoTable)[trackId].size();
   const auto& sttsEntries = stts->entries();
   const auto nrOfSttsEntries = sttsEntries.size();

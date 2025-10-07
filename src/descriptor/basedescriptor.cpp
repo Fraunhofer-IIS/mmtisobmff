@@ -133,7 +133,8 @@ void CBaseDescriptor::parse(ilo::ByteBuffer::const_iterator& begin,
     m_sizeOfInstance = m_sizeOfInstance << 7 | sizeByte;
   }
 
-  ILO_ASSERT_WITH(begin + size() <= end, std::out_of_range, "descriptor size exceeds input");
+  ILO_ASSERT_WITH(begin + static_cast<std::ptrdiff_t>(size()) <= end, std::out_of_range,
+                  "descriptor size exceeds input");
 }
 
 void CBaseDescriptor::write(ilo::ByteBuffer& buffer, ilo::ByteBuffer::iterator& position) const {
@@ -165,7 +166,7 @@ void CBaseDescriptor::writeBaseDescriptor(ilo::ByteBuffer& buffer,
   uint64_t instance = m_sizeOfInstance;
 
   uint8_t numBytes = static_cast<uint8_t>(m_sizeOfInstance / MAX_SIZE_IN_ONE_BYTE);
-  numBytes += (m_sizeOfInstance % MAX_SIZE_IN_ONE_BYTE) ? (1) : (0);
+  numBytes = static_cast<uint8_t>(numBytes + ((m_sizeOfInstance % MAX_SIZE_IN_ONE_BYTE) ? 1 : 0));
 
   std::deque<uint8_t> bytesToWrite;
 

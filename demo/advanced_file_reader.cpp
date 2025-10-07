@@ -238,7 +238,7 @@ void processAvcTrack(CIsobmffReader& reader, size_t trackNumber, size_t maxSampl
   std::cout << "########################################" << '\n';
 
   // If needed, the non-Vcl nalus can be converted into AnnexB
-  //(is stored in same order as in bytestream SPS, PPS, SPS_EXT)
+  // (is stored in same order as in bytestream SPS, PPS, SPS_EXT)
   SAvcSample avcAnnexbSample;
   tools::convertNonVclNalusToAnnexBNalus(*avcDcr, avcAnnexbSample);
 
@@ -378,7 +378,7 @@ void processHevcTrack(CIsobmffReader& reader, size_t trackNumber, size_t maxSamp
   std::cout << "########################################" << '\n';
 
   // If needed, the non-Vcl nalus can be converted into AnnexB
-  //(is stored in same order as in bytestream VPS, SPS, PPS)
+  // (is stored in same order as in bytestream VPS, SPS, PPS)
   SHevcSample hevcAnnexbSample;
   tools::convertNonVclNalusToAnnexBNalus(*hevcDcr, hevcAnnexbSample);
 
@@ -625,7 +625,7 @@ void processVvcTrack(CIsobmffReader& reader, size_t trackNumber, size_t maxSampl
   std::cout << "########################################" << '\n';
 
   // If needed, the non-Vcl nalus can be converted into AnnexB
-  //(is stored in same order as in bytestream VPS, SPS, PPS)
+  // (is stored in same order as in bytestream VPS, SPS, PPS)
   SVvcSample vvcAnnexbSample;
   tools::convertNonVclNalusToAnnexBNalus(*vvcDcr, vvcAnnexbSample);
 

@@ -606,11 +606,11 @@ struct CJxsTrackReader::PimplJxs {
 
     ILO_ASSERT(
         jpegVideoInfoList.size() <= 1,
-        "There are more than one JPEGXSVideoInformationBox in the track with the tracknumber %d.",
+        "There are more than one JPEGXSVideoInformationBox in the track with the tracknumber %zu.",
         tracknumber);
     ILO_ASSERT(
         profileAndLevelList.size() <= 1,
-        "There are more than one JPEGXSProfileandLevelBox in the track with the tracknumber %d.",
+        "There are more than one JPEGXSProfileandLevelBox in the track with the tracknumber %zu.",
         tracknumber);
 
     if (jpegVideoInfoList.size() > 0) {

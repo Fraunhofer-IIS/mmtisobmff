@@ -185,7 +185,7 @@ void CSampleSizeBox::writeBox(ilo::ByteBuffer& buffer, ilo::ByteBuffer::iterator
 void CSampleSizeBox::sanityCheck() const {
   if (m_sampleSize == 0 && m_entrySize.size() != m_sampleCount) {
     ILO_LOG_WARNING(
-        "Warning: the number of entries in stsz box must match the sample count: %u, %u",
+        "Warning: the number of entries in stsz box must match the sample count: %zu, %u",
         m_entrySize.size(), m_sampleCount);
   }
 }

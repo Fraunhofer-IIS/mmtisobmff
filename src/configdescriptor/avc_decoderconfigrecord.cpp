@@ -272,9 +272,7 @@ void CAvcDecoderConfigRecord::write(ilo::ByteBuffer& buffer, ilo::ByteBuffer::it
     ILO_ASSERT(static_cast<size_t>(buffer.end() - position) >= parameterSet.size(),
                "SPS data does not fit in buffer");
 
-    std::copy(parameterSet.begin(), parameterSet.end(), position);
-
-    position += parameterSet.size();
+    position = std::copy(parameterSet.begin(), parameterSet.end(), position);
   }
 
   ilo::writeUint8(buffer, position, static_cast<uint8_t>(m_pictureParameterSets.size()));
@@ -285,22 +283,20 @@ void CAvcDecoderConfigRecord::write(ilo::ByteBuffer& buffer, ilo::ByteBuffer::it
     ILO_ASSERT(static_cast<size_t>(buffer.end() - position) >= parameterSet.size(),
                "PPS data does not fit in buffer");
 
-    std::copy(parameterSet.begin(), parameterSet.end(), position);
-
-    position += parameterSet.size();
+    position = std::copy(parameterSet.begin(), parameterSet.end(), position);
   }
 
   if (m_avcProfileIndication == 100 || m_avcProfileIndication == 110 ||
       m_avcProfileIndication == 122 || m_avcProfileIndication == 144) {
-    uint8_t chromaFormatPadded = static_cast<uint8_t>(m_chromaFormat | (UINT8_T_MAX << 2));
+    uint8_t chromaFormatPadded = static_cast<uint8_t>(m_chromaFormat | (UINT8_MAX << 2));
     ilo::writeUint8(buffer, position, chromaFormatPadded);
 
     uint8_t bitDepthLumaMinus8Padded =
-        static_cast<uint8_t>(m_bitDepthLumaMinus8 | (UINT8_T_MAX << 3));
+        static_cast<uint8_t>(m_bitDepthLumaMinus8 | (UINT8_MAX << 3));
     ilo::writeUint8(buffer, position, bitDepthLumaMinus8Padded);
 
     uint8_t bitDepthChromaMinus8Padded =
-        static_cast<uint8_t>(m_bitDepthChromaMinus8 | (UINT8_T_MAX << 3));
+        static_cast<uint8_t>(m_bitDepthChromaMinus8 | (UINT8_MAX << 3));
     ilo::writeUint8(buffer, position, bitDepthChromaMinus8Padded);
 
     ilo::writeUint8(buffer, position, static_cast<uint8_t>(m_sequenceParameterExtSets.size()));
@@ -311,9 +307,7 @@ void CAvcDecoderConfigRecord::write(ilo::ByteBuffer& buffer, ilo::ByteBuffer::it
       ILO_ASSERT(static_cast<size_t>(buffer.end() - position) >= parameterSet.size(),
                  "SPS-EXT data does not fit in buffer");
 
-      std::copy(parameterSet.begin(), parameterSet.end(), position);
-
-      position += parameterSet.size();
+      position = std::copy(parameterSet.begin(), parameterSet.end(), position);
     }
   }
 }

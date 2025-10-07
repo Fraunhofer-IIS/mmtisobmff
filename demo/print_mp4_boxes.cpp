@@ -1490,7 +1490,7 @@ void doWork(int argc, char** argv) {
     std::string boxName = toString(boxElement.item->type());
     uint64_t boxSize = boxElement.item->size();
 
-    std::string treeSpaces(level, ' ');
+    std::string treeSpaces(static_cast<size_t>(level), ' ');
     std::cout << treeSpaces << boxName << " (" << boxSize << ")" << std::endl;
     treeSpaces.append("|");
 
@@ -1522,7 +1522,9 @@ void doWork(int argc, char** argv) {
   std::cout << "--Total Size: " << totalSize << " [Byte]" << std::endl;
   std::cout << "--Payload Size: " << overheadInfo.sizePayload << " [Byte]" << std::endl;
   std::cout << "--Overhead: " << overheadInfo.sizeOverhead << " [Byte] ("
-            << (float)overheadInfo.sizeOverhead * 100 / totalSize << "%)" << std::endl;
+            << static_cast<float>(overheadInfo.sizeOverhead) * 100.0F /
+                   static_cast<float>(totalSize)
+            << "%)" << std::endl;
 
   // Check if we actually have moov data to print some extra infos.
   if (findFirstBoxWithFourccAndType<box::CContainerBox>(tree, ilo::toFcc("moov"))) {

@@ -162,11 +162,10 @@ void CDecoderConfigurationBox::updateSize(uint64_t sizeValue) {
 
 void CDecoderConfigurationBox::writeBox(ilo::ByteBuffer& buffer,
                                         ilo::ByteBuffer::iterator& position) const {
-  ILO_ASSERT(buffer.end() >= position + decoderConfiguration().size(),
+  ILO_ASSERT(buffer.end() >= position + static_cast<std::ptrdiff_t>(decoderConfiguration().size()),
              "Buffer too small for decoder configuration");
 
-  std::copy(decoderConfiguration().begin(), decoderConfiguration().end(), position);
-  position += decoderConfiguration().size();
+  position = std::copy(decoderConfiguration().begin(), decoderConfiguration().end(), position);
 }
 
 }  // namespace box

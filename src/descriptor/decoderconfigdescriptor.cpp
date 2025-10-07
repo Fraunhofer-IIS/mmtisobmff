@@ -113,7 +113,7 @@ CDecoderConfigDescriptor::CDecoderConfigDescriptor(ilo::ByteBuffer::const_iterat
       m_maxBitrate(0),
       m_avgBitrate(0),
       m_remainingPayload(0) {
-  CDecoderConfigDescriptor::parse(begin, begin + size());
+  CDecoderConfigDescriptor::parse(begin, begin + static_cast<std::ptrdiff_t>(size()));
 }
 
 CDecoderConfigDescriptor::CDecoderConfigDescriptor(
@@ -254,10 +254,9 @@ void CDecoderConfigDescriptor::writeDescriptor(ilo::ByteBuffer& buffer,
 
   writeUint8(buffer, position, m_objectTypeIndication);
 
-  uint8_t tmpByte = 0;
-  tmpByte = static_cast<uint8_t>(m_streamType << 2);
-  tmpByte |= (m_upStream << 1);
-  tmpByte |= m_reserved;
+  uint8_t tmpByte = static_cast<uint8_t>(m_streamType << 2);
+  tmpByte = static_cast<uint8_t>(tmpByte | (m_upStream << 1));
+  tmpByte = static_cast<uint8_t>(tmpByte | m_reserved);
 
   writeUint8(buffer, position, tmpByte);
   writeUint24(buffer, position, m_bufferSizeDB);

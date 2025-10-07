@@ -98,7 +98,7 @@ namespace mmt {
 namespace isobmff {
 
 // Track enhancer to create a 'udta' container box with one or more entries
-// Each udta entry is expexted to be a ISO BMFF box (specified in MPEG-4 Part 12, Clause 4.2):
+// Each udta entry is expected to be a ISO BMFF box (specified in MPEG-4 Part 12, Clause 4.2):
 // 'size' [4 bytes] - 'type' (aka 4cc) [4 bytes] - payload ['size' bytes - 8]
 // Since the payload is user-defined (i.e. opaque to the file format layer) here it is just a
 // byte buffer. Potentially, it could contain nested boxes (if specified by the application).

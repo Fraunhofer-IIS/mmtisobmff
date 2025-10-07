@@ -430,8 +430,8 @@ void convertAnnexbByteBufferToVideoSampleBuffer(const ilo::ByteBuffer& annexbBuf
 /*!
  * @brief Function to fill an AVC decoder config record with non-VCL NALUs
  *
- * Function will convert (if necessary) and copy known non-VCL NALUs from the input into the
- * appropriate section of @ref config::CAvcDecoderConfigRecord.
+ * Function will convert (if necessary) and copy known non-VCL NALUs from
+ * @ref SAvcNonVclNalus structure into @ref config::CAvcDecoderConfigRecord.
  *
  * @param nonVclNalus NALU buffer to extract and copy non-VCL NALUs from.
  * @param configRecord AVC config record to copy non-VCL NALUs to.
@@ -441,8 +441,8 @@ void fillNonVclNalusIntoConfigRecord(const SAvcNonVclNalus& nonVclNalus,
 /*!
  * @brief Function to fill an HEVC decoder config record with non-VCL NALUs
  *
- * Function will convert (if necessary) and copy known non-VCL NALUs from the input into the
- * appropriate section of @ref config::CHevcDecoderConfigRecord.
+ * Function will convert (if necessary) and copy known non-VCL NALUs from
+ * @ref SAvcNonVclNalus structure into @ref config::CHevcDecoderConfigRecord.
  *
  * @param nonVclNalus NALU buffer to extract and copy non-VCL NALUs from.
  * @param configRecord HEVC config record to copy non-VCL NALUs to.
@@ -454,10 +454,31 @@ void fillNonVclNalusIntoConfigRecord(const SHevcNonVclNalus& nonVclNalus,
                                      config::CHevcDecoderConfigRecord& configRecord,
                                      bool allArrayComplete);
 /*!
+ * @brief Function to fill an HEVC decoder config record with non-VCL NALUs
+ *
+ * Function will convert (if necessary) and copy known non-VCL NALUs from
+ * @ref SHevcNonVclNalus structure into @ref config::CHevcDecoderConfigRecord.
+ *
+ * Allows more detailed configuration of arrayComplete flag (per non-VCL NALU type array) if known
+ * to the user. Each non-VCL NALU type that is provided via nonVclNalus parameter needs to have an
+ * entry in arrayCompleteMap. If that particular NALU type will be only present in MP4 config record
+ * (and not in bitstream) the boolean for that particular NALU type in the map must be set to true.
+ * If in addition this particular NALU type is also present in bitstream, the boolean for this NALU
+ * type in the map must be set to false.
+ *
+ * @param nonVclNalus NALU buffer to extract and copy non-VCL NALUs from.
+ * @param configRecord HEVC config record to copy non-VCL NALUs to.
+ * @param arrayCompleteMap Map with arrayComplete flag entries per non-VCL NALU type.
+ */
+void fillNonVclNalusIntoConfigRecord(const SHevcNonVclNalus& nonVclNalus,
+                                     config::CHevcDecoderConfigRecord& configRecord,
+                                     const std::map<uint8_t, bool>& arrayCompleteMap);
+
+/*!
  * @brief Function to fill a VVC decoder config record with non-VCL NALUs
  *
- * Function will convert (if necessary) and copy known non-VCL NALUs from the input into the
- * appropriate section of @ref config::CVvcDecoderConfigRecord.
+ * Function will convert (if necessary) and copy known non-VCL NALUs from
+ * @ref SVvcNonVclNalus structure into @ref config::CVvcDecoderConfigRecord.
  *
  * @param nonVclNalus NALU buffer to extract and copy non-VCL NALUs from.
  * @param configRecord VVC config record to copy non-VCL NALUs to.
@@ -469,6 +490,27 @@ void fillNonVclNalusIntoConfigRecord(const SHevcNonVclNalus& nonVclNalus,
 void fillNonVclNalusIntoConfigRecord(const SVvcNonVclNalus& nonVclNalus,
                                      config::CVvcDecoderConfigRecord& configRecord,
                                      bool allArrayComplete);
+
+/*!
+ * @brief Function to fill a VVC decoder config record with non-VCL NALUs
+ *
+ * Function will convert (if necessary) and copy known non-VCL NALUs from
+ * @ref SVvcNonVclNalus structure into @ref config::CVvcDecoderConfigRecord.
+ *
+ * Allows more detailed configuration of arrayComplete flag (per non-VCL NALU type array) if known
+ * to the user. Each non-VCL NALU type that is provided via nonVclNalus parameter needs to have an
+ * entry in arrayCompleteMap. If that particular NALU type will be only present in MP4 config record
+ * (and not in bitstream) the boolean for that particular NALU type in the map must be set to true.
+ * If in addition this particular NALU type is also present in bitstream, the boolean for this NALU
+ * type in the map must be set to false.
+ *
+ * @param nonVclNalus NALU buffer to extract and copy non-VCL NALUs from.
+ * @param configRecord VVC config record to copy non-VCL NALUs to.
+ * @param arrayCompleteMap Map with arrayComplete flag entries per non-VCL NALU type.
+ */
+void fillNonVclNalusIntoConfigRecord(const SVvcNonVclNalus& nonVclNalus,
+                                     config::CVvcDecoderConfigRecord& configRecord,
+                                     const std::map<uint8_t, bool>& arrayCompleteMap);
 
 /**@}*/
 

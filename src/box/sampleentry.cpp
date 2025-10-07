@@ -328,7 +328,7 @@ void CVisualSampleEntry::writeHeader(ilo::ByteBuffer& buffer,
 
   // Write compressor name
   for (auto compressorChar : m_compressorName) {
-    ilo::writeUint8(buffer, position, compressorChar);
+    ilo::writeUint8(buffer, position, static_cast<uint8_t>(compressorChar));
   }
 
   // Fill the rest of the compressor byte block with zeros

@@ -209,7 +209,7 @@ void process(const std::string& fileUri) {
   std::cout << "Jumping to nearest sync sample around time point "
             << "[" << seekConfig.seekPoint.duration() << "/" << seekConfig.seekPoint.timescale()
             << "] ("
-            << seekConfig.seekPoint.duration() /
+            << static_cast<double>(seekConfig.seekPoint.duration()) /
                    static_cast<double>(seekConfig.seekPoint.timescale())
             << "s) and read 2 samples" << std::endl;
   std::cout << "########################################" << std::endl;

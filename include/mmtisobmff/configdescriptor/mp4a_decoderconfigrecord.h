@@ -113,7 +113,6 @@ class CMp4aDecoderConfigRecord {
  public:
   /*!
    * @brief Config needed to create a new AAC config record class instance (for writing)
-   *
    */
   struct SConfig {
     /*!

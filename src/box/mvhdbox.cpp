@@ -89,6 +89,7 @@ amm-info@iis.fraunhofer.de
 #include <stdexcept>
 #include <limits>
 #include <algorithm>
+#include <cinttypes>
 
 // External headers
 #include "ilo/string_utils.h"
@@ -276,7 +277,8 @@ void CMovieHeaderBox::sanityCheck() {
 
   if (m_creationTime > m_modificationTime) {
     ILO_LOG_WARNING(
-        "Warning: Creation time in mvhd box of MP4 is smaller than modifcation time: %u, %u",
+        "Warning: Creation time in mvhd box of MP4 is smaller than modifcation time: %" PRIu64
+        ", %" PRIu64,
         m_creationTime, m_modificationTime);
   }
 }

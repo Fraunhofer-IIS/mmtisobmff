@@ -163,19 +163,19 @@ SSampleFlags valueToSampleFlags(uint32_t value) {
   flags.isDependedOn = static_cast<SSampleFlags::SampleIsDependedOn>((value & 0xC00000) >> 22);
   flags.hasRedundancy = static_cast<SSampleFlags::SampleHasRedundancy>((value & 0x300000) >> 20);
   flags.paddingValue = static_cast<uint8_t>((value & 0xE0000) >> 17);
-  flags.isNonSyncSample = ((value & 0x10000) >> 16) == 1;
+  flags.isNonSyncSample = ((value & 0x10000) >> 16) == 1 ? true : false;
   flags.degradationPriority = static_cast<uint16_t>(value & 0xFFFF);
 
   return flags;
 }
 
 uint32_t sampleFlagsToValue(const SSampleFlags& sampleFlags) {
-  uint32_t flagsValue = ((static_cast<uint8_t>(sampleFlags.isLeading)) << 26) +
-                        ((static_cast<uint8_t>(sampleFlags.dependsON)) << 24) +
-                        ((static_cast<uint8_t>(sampleFlags.isDependedOn)) << 22) +
-                        ((static_cast<uint8_t>(sampleFlags.hasRedundancy)) << 20) +
-                        ((static_cast<uint8_t>(sampleFlags.paddingValue)) << 17) +
-                        ((static_cast<uint8_t>(sampleFlags.isNonSyncSample)) << 16) +
+  uint32_t flagsValue = ((static_cast<uint32_t>(sampleFlags.isLeading)) << 26) +
+                        ((static_cast<uint32_t>(sampleFlags.dependsON)) << 24) +
+                        ((static_cast<uint32_t>(sampleFlags.isDependedOn)) << 22) +
+                        ((static_cast<uint32_t>(sampleFlags.hasRedundancy)) << 20) +
+                        ((static_cast<uint32_t>(sampleFlags.paddingValue)) << 17) +
+                        ((static_cast<uint32_t>(sampleFlags.isNonSyncSample)) << 16) +
                         static_cast<uint16_t>(sampleFlags.degradationPriority);
   return flagsValue;
 }
@@ -277,6 +277,16 @@ void copyEditList(const Twriter& writer, const SCopyConfig& config) {
         config.trackInfo.trackId);
   } else {
     for (auto entry : config.trackInfo.editList) {
+      if (entry.segmentDuration == 0) {
+        ILO_LOG_WARNING(
+            "Dropping edit list entry of trakId %d, because its duration is zero. This would "
+            "effectively disable all samples on the target trak which is most likely not "
+            "intentional. "
+            "The edit list most likely stems from an init segment that (per specification) does "
+            "not contain any samples.",
+            config.trackInfo.trackId);
+        continue;
+      }
       if (config.newMovieTimescale != config.oldMovieTimescale) {
         entry.segmentDuration = static_cast<uint64_t>(std::floor(
             entry.segmentDuration * config.newMovieTimescale / config.oldMovieTimescale));
@@ -583,7 +593,7 @@ EMp4Type getMp4TypeFromBuffer(const ilo::ByteBuffer& inputBuffer) {
     if (boxHeader.size == 0) {
       break;
     } else {
-      iter += static_cast<size_t>(boxHeader.size);
+      iter += static_cast<std::ptrdiff_t>(boxHeader.size);
     }
   }
 

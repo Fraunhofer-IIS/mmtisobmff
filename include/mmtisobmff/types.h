@@ -112,9 +112,12 @@ namespace isobmff {
  * Used to define starting point for file I/O access. @see IIsobmffInput
  */
 enum class SeekingOrigin {
-  beg, /**< Start file operation relative to beginning of the file */
-  end, /**< Start file operation relative to ending of the file */
-  cur  /**< Start file operation relative to current position in the file */
+  /*! Start file operation relative to beginning of the file */
+  beg,
+  /*! Start file operation relative to ending of the file */
+  end,
+  /*! Start file operation relative to current position in the file */
+  cur
 };
 
 using pos_type = uint64_t;
@@ -128,10 +131,14 @@ using offset_type = int64_t;
  * if the track type is not known by the library.
  */
 enum class TrackType : uint8_t {
-  undefined = 0, /**< Unknown track */
-  audio,         /**< Audio track */
-  video,         /**< Video track */
-  hint           /**< Hint track */
+  /*! Unknown track */
+  undefined = 0,
+  /*! Audio track */
+  audio,
+  /*! Video track */
+  video,
+  /*! Hint track */
+  hint
 };
 
 /*!
@@ -142,17 +149,26 @@ enum class TrackType : uint8_t {
  * if the codec type is not known by the library.
  */
 enum class Codec : uint8_t {
-  undefined = 0, /**< Unknown codec */
+  /*! Unknown codec */
+  undefined = 0,
 
-  mp4a = 4,  /**< MP4a based audio codec (AAC, HE-AAC, HE-AACv2, xHE-AAC, etc.) */
-  mpegh_mha, /**< MPEG-H MHA audio codec. RAW-AU in MP4 */
-  mpegh_mhm, /**< MPEG-H MHM audio codec. MHAS in MP4 */
+  /*! MP4a based audio codec (AAC, HE-AAC, HE-AACv2, xHE-AAC, etc.) */
+  mp4a = 4,
+  /*! MPEG-H MHA audio codec. RAW-AU in MP4 */
+  mpegh_mha,
+  /*! MPEG-H MHM audio codec. MHAS in MP4 */
+  mpegh_mhm,
 
-  mp4v = 100, /**< MPEG4 video codecs */
-  avc,        /**< AVC/H.264 video codec */
-  hevc,       /**< HEVC/H.265 video codec */
-  jxs,        /**< JPEG XS video codec */
-  vvc         /**< VVC/H.266 video codec */
+  /*! MPEG4 video codecs */
+  mp4v = 100,
+  /*! AVC/H.264 video codec */
+  avc,
+  /*! HEVC/H.265 video codec */
+  hevc,
+  /*! JPEG XS video codec */
+  jxs,
+  /*! VVC/H.266 video codec */
+  vvc
 };
 
 /*!
@@ -163,11 +179,16 @@ enum class Codec : uint8_t {
  * if the sample group is not known by the library.
  */
 enum class SampleGroupType : uint8_t {
-  undefined = 0, /**< Unknown sample group */
-  none,          /**< No sample group */
-  prol,          /**< Sample group of type Roll-Recovery */
-  roll,          /**< Sample group of type Pre-Roll */
-  sap            /**< Sample group of type Stream-Access-Point */
+  /*! Unknown sample group */
+  undefined = 0,
+  /*! No sample group */
+  none,
+  /*! Sample group of type Roll-Recovery */
+  prol,
+  /*! Sample group of type Pre-Roll */
+  roll,
+  /*! Sample group of type Stream-Access-Point */
+  sap
 };
 
 /*!
@@ -288,7 +309,8 @@ struct CSample {
  *
  * NALUs are not stored as continuous data inside CSample but have size fields before each NALU. The
  * iterators of the sparse buffer point to each NALU start and end. NALUs also (in general) must be
- * in RAW format (without AnnexB encapsulation) for isobmff storage. <PRE>
+ * in RAW format (without AnnexB encapsulation) for isobmff storage.
+ * <PRE>
  *  <-------------CSampleStructure------------>
  *  +--------+ +--------+ +--------+ +--------+
  *  |  Size  | |  NALU  | |  Size  | |  NALU  |
@@ -551,13 +573,13 @@ struct SSampleFlags {
 
   enum class SampleHasRedundancy : uint8_t { unknown = 0, yes = 1, no = 2, reserved = 3 };
 
-  // 4 bits: reserved
-  // 2 bits: is_leading
-  // 2 bits: sample_depends_on
-  // 2 bits: sample_is_depended_on
-  // 2 bits: sample_has_redundancy
-  // 3 bits: sample_padding_value
-  // 1 bit : sample_is_non_sync_sample
+  //  4 bits: reserved
+  //  2 bits: is_leading
+  //  2 bits: sample_depends_on
+  //  2 bits: sample_is_depended_on
+  //  2 bits: sample_has_redundancy
+  //  3 bits: sample_padding_value
+  //  1 bit : sample_is_non_sync_sample
   // 16 bits: sample_degradation_priority
   Leading isLeading = Leading::unknown;
   SampleDependsOn dependsON = SampleDependsOn::unknown;

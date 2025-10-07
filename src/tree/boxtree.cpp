@@ -125,9 +125,9 @@ SOverheadInfo calculateOverhead(const BoxTree& tree) {
 
   for (size_t nodeNr = 0; nodeNr < tree.childCount(); ++nodeNr) {
     if (tree[nodeNr].item->type() == ilo::toFcc("mdat")) {
-      auto mdatBoxHeaderLength = 8;
+      auto mdatBoxHeaderLength = 8U;
       if (tree[nodeNr].item->had64BitSizeInInput()) {
-        mdatBoxHeaderLength = 16;
+        mdatBoxHeaderLength = 16U;
       }
       info.sizeOverhead += mdatBoxHeaderLength;
       info.sizePayload += (tree[nodeNr].item->size() - mdatBoxHeaderLength);

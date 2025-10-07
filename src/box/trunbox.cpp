@@ -387,7 +387,7 @@ void CTrackRunBox::writeBox(ilo::ByteBuffer& buffer, ilo::ByteBuffer::iterator& 
   }
 }
 
-uint32_t CTrackRunBox::dataOffset() const {
+int32_t CTrackRunBox::dataOffset() const {
   ILO_ASSERT(dataOffsetPresent(), "Data offset field not present because flag is not set");
   return m_dataOffset;
 }

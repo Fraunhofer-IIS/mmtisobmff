@@ -103,7 +103,7 @@ namespace descriptor {
 CESIdIncDescriptor::CESIdIncDescriptor(ilo::ByteBuffer::const_iterator& begin,
                                        const ilo::ByteBuffer::const_iterator& end)
     : CBaseDescriptor(begin, end), m_trackId(0) {
-  CESIdIncDescriptor::parse(begin, begin + size());
+  CESIdIncDescriptor::parse(begin, begin + static_cast<std::ptrdiff_t>(size()));
 }
 
 CESIdIncDescriptor::CESIdIncDescriptor(const SESIdIncDescriptorWriteConfig& descriptorData)

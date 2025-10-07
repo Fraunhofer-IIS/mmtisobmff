@@ -408,7 +408,7 @@ void CIsobmffWriter::Pimpl::createSidxBox(ilo::ByteBuffer& sidxBuff) {
     reference.referenceSize = static_cast<uint32_t>(updateSizeAndReturnTotalSize(*fragTree));
 
     // startsWithSap is true when sample with earliest presentation time is a sync Sample
-    reference.startsWithSap = (sapFound && (curFragEarliestPts == ptsFirstSap));
+    reference.startsWithSap = (sapFound && (curFragEarliestPts == ptsFirstSap)) ? true : false;
 
     if (!reference.startsWithSap && sapFound) {
       reference.sapDeltaTime = static_cast<uint32_t>(ptsFirstSap - curFragEarliestPts);
@@ -994,7 +994,7 @@ void CIsobmffWriter::Pimpl::updateTrunDataOffset(BoxTree::NodeType& subTree,
 
     // Add the offset
     trunConfig.dataOffsetPresent = true;
-    trunConfig.dataoffset = dataOffset;
+    trunConfig.dataoffset = static_cast<int32_t>(dataOffset);
 
     // Replace old trun box with new one
     auto nodefactory =
@@ -1067,7 +1067,7 @@ void CIsobmffWriter::Pimpl::updateStscBox(STrakSampleEnhancerConfig& config,
                                           const bool& largeOffsets) {
   // An entry in the SampleToChunk box is created for every chunk of samples in the interleaved
   // samplestore that has a different amount of samples than the last entry stored in the vector
-  // of entries in the box.  We determine a new chunk in the samplestore by checking the trackId
+  // of entries in the box. We determine a new chunk in the samplestore by checking the trackId
   // of the current sample. If it is different than the trackId from the function parameters,
   // then this means that we have a new chunk.
   if (samplesPerChunk != 0 &&

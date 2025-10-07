@@ -156,8 +156,7 @@ uint64_t CMhaDecoderConfigRecord::write(ilo::ByteBuffer& buffer,
   ILO_ASSERT(static_cast<size_t>(buffer.end() - position) >= m_mpegh3daConfig.size(),
              "Error-CMhaDcr: DSC data does not fit in buffer!");
 
-  std::copy(m_mpegh3daConfig.begin(), m_mpegh3daConfig.end(), position);
-  position += m_mpegh3daConfig.size();
+  position = std::copy(m_mpegh3daConfig.begin(), m_mpegh3daConfig.end(), position);
   writtenBytes += m_mpegh3daConfig.size();
 
   return writtenBytes;

@@ -138,7 +138,7 @@ void CBox::parse(ilo::ByteBuffer::const_iterator& begin,
 
   switch (m_size) {
     case (0x00U):
-      m_size = static_cast<uint64_t>(end - begin + 8u);  // 8 bytes were already read above
+      m_size = static_cast<uint64_t>(end - begin + 8);  // 8 bytes were already read above
       break;
 
     case (0x01U):

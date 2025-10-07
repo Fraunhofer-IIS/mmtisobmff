@@ -333,20 +333,19 @@ void CHevcDecoderConfigRecord::parse(ilo::ByteBuffer::const_iterator& begin,
 void CHevcDecoderConfigRecord::write(ByteBuffer& buffer, ByteBuffer::iterator& position) {
   writeUint8(buffer, position, m_configurationVersion);
 
-  uint8_t genProfSpaceFlagIdc = 0;
-  genProfSpaceFlagIdc |= (m_generalProfileSpace << 6);
-  m_generalTierFlag ? genProfSpaceFlagIdc |= 0x20 : 0;
+  uint8_t genProfSpaceFlagIdc = static_cast<uint8_t>(m_generalProfileSpace << 6);
+  if (m_generalTierFlag) {
+    genProfSpaceFlagIdc |= 0x20;
+  }
   genProfSpaceFlagIdc |= m_generalProfileIdc;
   writeUint8(buffer, position, genProfSpaceFlagIdc);
 
   writeUint32(buffer, position, m_generalProfileCompatabilityFlags);
 
-  uint32_t conIndFlagsLevelIdc32 = 0;
-  uint16_t conIndFlagsLevelIdc16 = 0;
-  conIndFlagsLevelIdc32 |= (m_generalConstraintIndicatorFlags >> 16);
+  uint32_t conIndFlagsLevelIdc32 = static_cast<uint32_t>(m_generalConstraintIndicatorFlags >> 16);
   writeUint32(buffer, position, conIndFlagsLevelIdc32);
 
-  conIndFlagsLevelIdc16 |= (m_generalConstraintIndicatorFlags);
+  uint16_t conIndFlagsLevelIdc16 = static_cast<uint16_t>(m_generalConstraintIndicatorFlags);
   writeUint16(buffer, position, conIndFlagsLevelIdc16);
 
   writeUint8(buffer, position, m_generalLevelIdc);
@@ -402,18 +401,22 @@ void CHevcDecoderConfigRecord::write(ByteBuffer& buffer, ByteBuffer::iterator& p
   writeUint8(buffer, position, bitDepthChromaMinus8Value);
   writeUint16(buffer, position, m_avgFrameRate);
 
-  uint8_t tmp = 0;
-  tmp |= (m_constFrameRate << 6);
-  tmp |= (m_numTemporatlLayers << 3);
-  m_temporalIdNested ? tmp |= 0x04 : 0;
-  tmp |= m_lengthSizeMinusOne;
+  uint8_t tmp = static_cast<uint8_t>(m_constFrameRate << 6);
+  tmp = static_cast<uint8_t>(tmp | (m_numTemporatlLayers << 3));
+  if (m_temporalIdNested) {
+    tmp = static_cast<uint8_t>(tmp | 0x04);
+  }
+  tmp = static_cast<uint8_t>(tmp | m_lengthSizeMinusOne);
 
   writeUint8(buffer, position, tmp);
   writeUint8(buffer, position, static_cast<uint8_t>(m_nonVclArrays.size()));
 
   for (auto hevcArray : m_nonVclArrays) {
     uint8_t arrayCompletenessReservedNaluType = 0;
-    hevcArray.arrayCompleteness ? arrayCompletenessReservedNaluType |= 0x80 : 0;
+    if (hevcArray.arrayCompleteness) {
+      arrayCompletenessReservedNaluType =
+          static_cast<uint8_t>(arrayCompletenessReservedNaluType | 0x80);
+    }
     arrayCompletenessReservedNaluType |= hevcArray.naluType;
     writeUint8(buffer, position, arrayCompletenessReservedNaluType);
 
@@ -425,9 +428,7 @@ void CHevcDecoderConfigRecord::write(ByteBuffer& buffer, ByteBuffer::iterator& p
       ILO_ASSERT(static_cast<size_t>(buffer.end() - position) >= nalu.size(),
                  "HEVC Decoder Configuration Record: Nalu data does not fit in buffer!");
 
-      std::copy(nalu.begin(), nalu.end(), position);
-
-      position += nalu.size();
+      position = std::copy(nalu.begin(), nalu.end(), position);
     }
   }
 }

@@ -255,7 +255,7 @@ std::shared_ptr<box_type> findFirstBoxWithPathAndType(const BoxNode& tree,
 
 inline void prettyPrintTree(const BoxNode& tree) {
   ilo::visitAllOf(tree, [](const BoxElement& e, int32_t level) {
-    std::string indent(level, '\t');
+    std::string indent(static_cast<size_t>(level), '\t');
     std::printf("%s", indent.c_str());
     std::printf("%s (%llu)\n", ilo::toString(e.item->type()).c_str(),
                 (unsigned long long)e.item->size());
@@ -268,9 +268,9 @@ inline uint64_t treeSizeWithoutMdatPayloadInBytes(const BoxNode& tree) {
   for (size_t nodeNr = 0; nodeNr < tree.childCount(); ++nodeNr) {
     treeSize += tree[nodeNr].item->size();
     if (tree[nodeNr].item->type() == ilo::toFcc("mdat")) {
-      auto mdatBoxHeaderLength = 8;
+      auto mdatBoxHeaderLength = 8U;
       if (tree[nodeNr].item->had64BitSizeInInput()) {
-        mdatBoxHeaderLength = 16;
+        mdatBoxHeaderLength = 16U;
       }
       treeSize -= tree[nodeNr].item->size() - mdatBoxHeaderLength;
     }

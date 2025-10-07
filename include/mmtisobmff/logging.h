@@ -101,8 +101,10 @@ namespace isobmff {
 
 //! Mode to select how to to handle existing files
 enum class RedirectMode {
-  overwrite, /**< Overwrite existing file */
-  append     /**< Append to existing file or create one */
+  /*! Overwrite existing file */
+  overwrite,
+  /*! Append to existing file or create one */
+  append
 };
 
 /*!
@@ -136,8 +138,10 @@ void disableLogging();
 
 //! Available log levels
 enum class LogLevel {
-  standard, /**< Default log level with less info prints */
-  verbose   /**< Verbose log level with all info prints */
+  /*! Default log level with less info prints */
+  standard,
+  /*! Verbose log level with all info prints */
+  verbose
 };
 
 /*!
@@ -149,6 +153,7 @@ enum class LogLevel {
  * @note Setting this will affect all instances of this library
  */
 void setLogLevel(LogLevel logLevel);
+
 /**@}*/
 }  // namespace isobmff
 }  // namespace mmt

@@ -451,7 +451,7 @@ ISOBMFF_ERR isobmff_setLogLevel(const LogLevel_C logLevel) {
   try {
     setLogLevel(convertLogLevelCEnum(logLevel));
   } catch (const std::exception& e) {
-    ILO_LOG_ERROR("Setting the log level failed: %s", e.what());
+    ILO_LOG_ERROR("Setting the log level failed %s", e.what());
     return ISOBMFF_LIB_ERR;
   }
   return ISOBMFF_OK;
@@ -1765,7 +1765,7 @@ ISOBMFF_ERR isobmff_force64bitMediaDecodeTime(MovieConfig* config, const uint8_t
     ILO_LOG_ERROR("the 64-bit MDT flag must have a value of 0 or 1. Assuming a value of 1");
   }
 
-  config->force64bitMDT = (use64bitMDT >= 1);
+  config->force64bitMDT = (use64bitMDT >= 1) ? true : false;
 
   return ISOBMFF_OK;
 }
@@ -2025,7 +2025,7 @@ ISOBMFF_ERR isobmff_newMediaFileSegment(ISOBMFF_Writer* isobmff, const char* out
     ILO_LOG_ERROR("The isLastSegment flag must have a value of 0 or 1. Assuming a value of 1.");
   }
 
-  bool isLastSeg = (isLastSegment >= 1);
+  bool isLastSeg = (isLastSegment >= 1) ? true : false;
 
   try {
     isobmff->isobmffWriter->createMediaFileSegment(outFileUri, isLastSeg);
@@ -2133,7 +2133,7 @@ ISOBMFF_ERR isobmff_newMediaMemorySegment(ISOBMFF_Writer* isobmff, uint8_t** dat
     ILO_LOG_ERROR("The isLastSegment flag must have a value of 0 or 1. Assuming a value of 1.");
   }
 
-  bool isLastSeg = (isLastSegment >= 1);
+  bool isLastSeg = (isLastSegment >= 1) ? true : false;
 
   try {
     isobmff->buffer = isobmff->isobmffWriter->createMediaMemSegment(true, isLastSeg);
@@ -3150,7 +3150,7 @@ ISOBMFF_ERR isobmff_resetSample(Sample* sample) {
 
     sample->clear();
   } catch (const std::exception& e) {
-    ILO_LOG_ERROR("Failed to clear sample: ", e.what());
+    ILO_LOG_ERROR("Failed to clear sample: %s", e.what());
     return ISOBMFF_LIB_ERR;
   }
 
@@ -3350,7 +3350,7 @@ ISOBMFF_ERR isobmff_setSampleSyncFlag(Sample* sample, const uint8_t isSyncSample
     ILO_LOG_ERROR("Flag must have a value of 0 or 1. Assuming a value of 1.");
   }
 
-  sample->isSyncSample = (isSyncSample >= 1);
+  sample->isSyncSample = (isSyncSample >= 1) ? true : false;
 
   return ISOBMFF_OK;
 }

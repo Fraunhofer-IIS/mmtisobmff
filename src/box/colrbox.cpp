@@ -147,14 +147,13 @@ void CColourInformationBox::parse(ilo::ByteBuffer::const_iterator& begin,
     uint8_t tmp = ilo::readUint8(begin, end);
     m_fullRangeFlag = (tmp & 0x80) > 0;
   } else if (m_colourType == ilo::toFcc("rICC") || m_colourType == ilo::toFcc("prof")) {
-    size_t iccProfileSize =
-        static_cast<size_t>(size()) - 8 - 4;  // -8: Box header(size + fcc) -4: colour_type
+    auto iccProfileSize =
+        static_cast<std::ptrdiff_t>(size()) - 8 - 4;  // -8: Box header(size + fcc) -4: colour_type
     if (had64BitSizeInInput()) {
       iccProfileSize -= 8;  // for 64 bit size in Box header
     }
 
-    ILO_ASSERT(static_cast<uint64_t>(end - begin) >= iccProfileSize,
-               "Not enough data to read ICC profile.");
+    ILO_ASSERT((end - begin) >= iccProfileSize, "Not enough data to read ICC profile.");
     m_iccProfile = ilo::ByteBuffer(begin, begin + iccProfileSize);
     begin += iccProfileSize;
   } else {

@@ -126,8 +126,8 @@ void CGenericDecoderSpecificInfo::parse(ilo::ByteBuffer::const_iterator& begin,
 
   ILO_ASSERT_WITH(size() <= (static_cast<size_t>(end - begin)), std::logic_error,
                   "CGenericDecoderSpecificInfo: not enough data in buffer");
-  m_decoderSpecificInfo = ilo::ByteBuffer(begin, begin + size());
-  begin += size();
+  m_decoderSpecificInfo = ilo::ByteBuffer(begin, begin + static_cast<std::ptrdiff_t>(size()));
+  begin += static_cast<std::ptrdiff_t>(size());
 
   return;
 }
@@ -165,8 +165,7 @@ void CGenericDecoderSpecificInfo::writeDescriptor(ilo::ByteBuffer& buffer,
       std::logic_error,
       "CGenericDecoderSpecificInfo: Decoder Specific Info data does not fit in buffer!");
 
-  std::copy(m_decoderSpecificInfo.begin(), m_decoderSpecificInfo.end(), position);
-  position += m_decoderSpecificInfo.size();
+  position = std::copy(m_decoderSpecificInfo.begin(), m_decoderSpecificInfo.end(), position);
 }
 }  // namespace descriptor
 }  // namespace isobmff

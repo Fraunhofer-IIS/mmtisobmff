@@ -106,14 +106,20 @@ namespace isobmff {
 
 //! Supported Stream Access Point types
 enum class ESapType : uint8_t {
-  SapTypeInvalid = 0, /**< Unknown stream access type */
-  SapType1 = 1,       /**< Indicates a sync sample (see codec standard) */
-  SapType2 = 2,       /**< Indicates a sync sample (see codec standard) */
-  SapType3 = 3,       /**< SAP is marked as a member of a sample group of type 'rap' */
-  SapType4 =
-      4, /**< SAP is marked as a member of a sample group of type 'roll', with rolldistance > 0 */
-  SapType5 = 5, /**< No specific signalling in isobmff standard supported */
-  SapType6 = 6  /**< No specific signalling in isobmff standard supported */
+  /*! Unknown stream access type */
+  SapTypeInvalid = 0,
+  /*! Indicates a sync sample (see codec standard) */
+  SapType1 = 1,
+  /*! Indicates a sync sample (see codec standard) */
+  SapType2 = 2,
+  /*! SAP is marked as a member of a sample group of type 'rap' */
+  SapType3 = 3,
+  /*! SAP is marked as a member of a sample group of type 'roll', with rolldistance > 0 */
+  SapType4 = 4,
+  /*! No specific signalling in isobmff standard supported */
+  SapType5 = 5,
+  /*! No specific signalling in isobmff standard supported */
+  SapType6 = 6
 };
 
 //! Config for the Segment Index Box

@@ -169,8 +169,9 @@ SCommandlineParams parseCommanline(int argc, char** argv) {
       cmdLineParams.type = std::string(argv[++i]);
     } else if (std::string(argv[i]) == "-force") {
       cmdLineParams.ignoreSyncSamples = true;
-    } else  // invalid argument or missing value for argument
-    {
+    } else {
+      // invalid argument or missing value for argument
+
       std::string errorMsg;
       if (i + 1 < argc) {
         errorMsg = "Unknown argument found: " + std::string(argv[i]);

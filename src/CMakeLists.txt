@@ -161,6 +161,7 @@ set(srcTools
 
 set(srcReader
     common/tracksampleinfo.h
+    reader/input.cpp
     reader/reader.cpp
     reader/pimpl.h
     reader/samplereader.h
@@ -215,6 +216,7 @@ set(srcWriter
     writer/trak_editlist_enhancer.cpp
     writer/trak_userdata_enhancer.h
     writer/trak_userdata_enhancer.cpp
+    writer/output.cpp
 )
 
 set(srcCInterface

@@ -169,7 +169,7 @@ static ilo::ByteBuffer::const_iterator boxEnd(const ilo::ByteBuffer::const_itera
     return end;
   }
 
-  return begin + static_cast<size_t>(boxSizeType.size);
+  return begin + static_cast<std::ptrdiff_t>(boxSizeType.size);
 }
 
 void CNodeFactory::createNode(BoxTree::NodeType& addTo, ilo::ByteBuffer::const_iterator& begin,

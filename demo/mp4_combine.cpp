@@ -174,8 +174,9 @@ SCommandlineParams parseCommanline(int argc, char** argv) {
                       "-t found, but not after a valid -if statement.");
       cmdLineParams.inputParams.back().trackIndices.push_back(
           static_cast<size_t>(std::stoul(argv[++i])));
-    } else  // invalid argument or missing value for argument
-    {
+    } else {
+      // invalid argument or missing value for argument
+
       std::string errorMsg;
       if (i + 1 < argc) {
         errorMsg = "Unknown argument found: " + std::string(argv[i]);
@@ -200,8 +201,8 @@ TrackIndexList createIndexList(const TrackIndexList& trackIndices,
   for (auto& tIndex : trackIndices) {
     ILO_ASSERT_WITH(
         tIndex < trackInfoVec.size(), std::invalid_argument,
-        "Selected track index (zero based) of %d is not in range of available tracks (%d)", tIndex,
-        trackInfoVec.size());
+        "Selected track index (zero based) of %zu is not in range of available tracks (%zu)",
+        tIndex, trackInfoVec.size());
   }
 
   if (!trackIndices.empty()) {

@@ -111,7 +111,7 @@ CESDescriptor::CESDescriptor(ilo::ByteBuffer::const_iterator& begin,
       m_dependsOn_ES_ID(0),
       m_URLlength(0),
       m_OCR_ES_Id(0) {
-  CESDescriptor::parse(begin, begin + size());
+  CESDescriptor::parse(begin, begin + static_cast<std::ptrdiff_t>(size()));
 }
 
 CESDescriptor::CESDescriptor(const SESDescriptorWriteConfig& descriptorData)
@@ -134,9 +134,9 @@ void CESDescriptor::updateSize(uint32_t sizeValue) {
   sizeValue += 2;  // ES_ID
   sizeValue += 1;  // streamDependenceFlag, URLflag, OCRStreamFlag, streamPriority
 
-  m_streamDependenceFlag ? sizeValue += 2 : 0;     // dependsOn_ES_ID
-  m_URLflag ? sizeValue += (1 + m_URLlength) : 0;  // URLlength, URLstring[URLlength]
-  m_OCRstreamFlag ? sizeValue += 2 : 0;            // OCR_ES_Id
+  m_streamDependenceFlag ? sizeValue += 2U : 0;     // dependsOn_ES_ID
+  m_URLflag ? sizeValue += (1U + m_URLlength) : 0;  // URLlength, URLstring[URLlength]
+  m_OCRstreamFlag ? sizeValue += 2U : 0;            // OCR_ES_Id
 
   sizeValue += 1;  // dcd tag
   sizeValue += (m_dcd.size() / MAX_SIZE_IN_ONE_BYTE) +
@@ -318,11 +318,10 @@ void CESDescriptor::writeDescriptor(ilo::ByteBuffer& buffer,
 
   writeUint16(buffer, position, m_ES_id);
 
-  uint8_t tmpByte = 0;
-  tmpByte = static_cast<uint8_t>(m_streamDependenceFlag << 7);
-  tmpByte |= (m_URLflag << 6);
-  tmpByte |= (m_OCRstreamFlag << 5);
-  tmpByte |= m_streamPriority;
+  uint8_t tmpByte = static_cast<uint8_t>(m_streamDependenceFlag << 7);
+  tmpByte = static_cast<uint8_t>(tmpByte | (m_URLflag << 6));
+  tmpByte = static_cast<uint8_t>(tmpByte | (m_OCRstreamFlag << 5));
+  tmpByte = static_cast<uint8_t>(tmpByte | m_streamPriority);
 
   writeUint8(buffer, position, tmpByte);
 
