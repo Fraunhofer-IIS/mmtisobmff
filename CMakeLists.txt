@@ -1,12 +1,12 @@
 cmake_minimum_required( VERSION 3.16.0 )
 include(FetchContent)
 
-project(mmtisobmff VERSION 1.0.1)
+project(mmtisobmff VERSION 1.0.2)
 
 FetchContent_Declare(
   ilo
   GIT_REPOSITORY https://github.com/Fraunhofer-IIS/ilo.git
-  GIT_TAG        r1.0.0
+  GIT_TAG        r2.0.0
 )
 
 FetchContent_MakeAvailable(ilo)
