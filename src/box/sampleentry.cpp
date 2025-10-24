@@ -267,8 +267,9 @@ void CVisualSampleEntry::parseBox(ilo::ByteBuffer::const_iterator& begin,
                                   const ilo::ByteBuffer::const_iterator& end) {
   std::vector<uint32_t> predefined = ilo::readUint32Array(begin, end, 4);
 
-  ILO_ASSERT(std::accumulate(predefined.begin(), predefined.end(), 0) == 0,
-             "All predefined values in visual audio sample entry must be 0");
+  if (std::accumulate(predefined.begin(), predefined.end(), 0) != 0) {
+    ILO_LOG_WARNING("All predefined values in visual audio sample entry must be 0");
+  }
 
   m_width = ilo::readUint16(begin, end);
   m_height = ilo::readUint16(begin, end);
