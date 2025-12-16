@@ -135,7 +135,7 @@ set(srcDescriptors
     descriptor/esidincdescriptor.cpp
     descriptor/esidincdescriptor.h
     )
-    
+
 set(srcTools
     common/types.cpp
     common/videohelpertools.cpp
@@ -178,9 +178,9 @@ set(srcWriter
     writer/sample_store.cpp
     writer/treebuilder.h
     writer/initsegment_tree_builder.h
-    writer/initsegment_tree_builder.cpp 
+    writer/initsegment_tree_builder.cpp
     writer/mediafragment_tree_builder.h
-    writer/mediafragment_tree_builder.cpp 
+    writer/mediafragment_tree_builder.cpp
     writer/treeenhancer.h
     writer/mpegh_tree_enhancer.h
     writer/mpegh_tree_enhancer.cpp
@@ -193,7 +193,7 @@ set(srcWriter
     writer/trak_tree_enhancer.h
     writer/trak_tree_enhancer.cpp
     writer/traf_tree_enhancer.h
-    writer/traf_tree_enhancer.cpp 
+    writer/traf_tree_enhancer.cpp
     writer/trak_sample_enhancer.h
     writer/trak_sample_enhancer.cpp
     writer/traf_sample_enhancer.h
@@ -258,7 +258,7 @@ set(libraries ilo)
 
 # Target : mmtisobmff C++ Library
 add_library(mmtisobmff STATIC ${srcCfgRecords} ${srcBoxes} ${srcDescriptors} ${srcTools} ${srcReader} ${srcWriter} ${publicHeaders})
-set_target_properties(mmtisobmff PROPERTIES PUBLIC_HEADER "${publicHeaders}")
+target_include_directories(mmtisobmff PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(mmtisobmff ${libraries})
 target_compile_features(mmtisobmff PUBLIC cxx_std_11)
 set_target_properties(mmtisobmff PROPERTIES CXX_EXTENSIONS OFF)
@@ -269,7 +269,7 @@ endif()
 
 # Target : mmtisobmff C Library
 add_library(mmtisobmff_c STATIC ${srcCInterface})
-set_target_properties(mmtisobmff_c PROPERTIES PUBLIC_HEADER "${publicHeadersC}")
+target_include_directories(mmtisobmff_c PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(mmtisobmff_c PRIVATE mmtisobmff)
 target_compile_features(mmtisobmff_c PUBLIC cxx_std_11)
 set_target_properties(mmtisobmff_c PROPERTIES CXX_EXTENSIONS OFF)
@@ -284,3 +284,7 @@ if("${CMAKE_CXX_FLAGS}" MATCHES "unsigned-integer-overflow")
   target_compile_options(mmtisobmff PRIVATE "-fsanitize-blacklist=${CMAKE_CURRENT_SOURCE_DIR}/../sanitizer-ignorelist.txt")
   target_compile_options(mmtisobmff_c PRIVATE "-fsanitize-blacklist=${CMAKE_CURRENT_SOURCE_DIR}/../sanitizer-ignorelist.txt")
 endif()
+
+include(GNUInstallDirs)
+install(TARGETS mmtisobmff)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} FILES_MATCHING PATTERN "*.h")
