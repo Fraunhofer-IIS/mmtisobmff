@@ -513,6 +513,9 @@ void CVvcDecoderConfigRecord::parse(ilo::ByteBuffer::const_iterator& begin,
           begin + static_cast<std::ptrdiff_t>(bitParser.nofReadBits() / 8);
       ilo::ByteBuffer::const_iterator naluEnd =
           begin + static_cast<std::ptrdiff_t>(bitParser.nofReadBits() / 8 + nalUnitLength);
+      ILO_ASSERT(naluEnd <= end,
+                 "VVC Decoder Configuration Record: Nalu length exceeds input buffer!");
+
       array.nalus.emplace_back(naluBegin, naluEnd);
       ILO_ASSERT(array.nalus.back().size() == nalUnitLength, "Failed to read nalu.");
       bitParser.seek(nalUnitLength * 8, ilo::EPosType::cur);

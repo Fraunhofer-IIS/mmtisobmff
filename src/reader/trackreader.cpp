@@ -432,7 +432,7 @@ CAvcTrackReader::CAvcTrackReader(std::weak_ptr<CIsobmffReader::Pimpl> reader_pim
       new CAvcTrackReader::PimplAvc(reader_pimpl, tracknumber));
 
   auto cfgRecordBlob = pavc->m_genericVideoTrackReader.decoderConfigRecord();
-  if (cfgRecordBlob.size() != 0) {
+  if (!cfgRecordBlob.empty()) {
     ilo::ByteBuffer::const_iterator dataBegin = cfgRecordBlob.cbegin();
     pavc->m_avcConfigRecord = std::unique_ptr<config::CAvcDecoderConfigRecord>(
         new config::CAvcDecoderConfigRecord(dataBegin, cfgRecordBlob.end()));
@@ -445,7 +445,7 @@ SSampleExtraInfo CAvcTrackReader::nextSample(SAvcSample& avcSample, bool preallo
   avcSample.clear();
   SSampleExtraInfo sExtraInfo =
       pavc->m_genericVideoTrackReader.nextSample(avcSample.sample, preallocate);
-  if (avcSample.sample.rawData.size() != 0) {
+  if (pavc->m_avcConfigRecord && !avcSample.sample.rawData.empty()) {
     tools::parseVideoSampleNalus(avcSample, *pavc->m_avcConfigRecord);
   }
   return sExtraInfo;
@@ -456,7 +456,7 @@ SSampleExtraInfo CAvcTrackReader::sampleByIndex(size_t sampleIndex, SAvcSample& 
   avcSample.clear();
   SSampleExtraInfo sExtraInfo =
       pavc->m_genericVideoTrackReader.sampleByIndex(sampleIndex, avcSample.sample, preallocate);
-  if (avcSample.sample.rawData.size() != 0) {
+  if (pavc->m_avcConfigRecord && !avcSample.sample.rawData.empty()) {
     tools::parseVideoSampleNalus(avcSample, *pavc->m_avcConfigRecord);
   }
   return sExtraInfo;
@@ -467,7 +467,7 @@ SSampleExtraInfo CAvcTrackReader::sampleByTimestamp(const SSeekConfig& seekConfi
   avcSample.clear();
   SSampleExtraInfo sExtraInfo =
       pavc->m_genericVideoTrackReader.sampleByTimestamp(seekConfig, avcSample.sample, preallocate);
-  if (avcSample.sample.rawData.size() != 0) {
+  if (pavc->m_avcConfigRecord && !avcSample.sample.rawData.empty()) {
     tools::parseVideoSampleNalus(avcSample, *pavc->m_avcConfigRecord);
   }
   return sExtraInfo;
@@ -498,8 +498,10 @@ uint16_t CAvcTrackReader::depth() const {
 }
 
 std::unique_ptr<config::CAvcDecoderConfigRecord> CAvcTrackReader::avcDecoderConfigRecord() const {
-  return std::unique_ptr<config::CAvcDecoderConfigRecord>(
-      new config::CAvcDecoderConfigRecord(*pavc->m_avcConfigRecord));
+  return pavc->m_avcConfigRecord
+             ? std::unique_ptr<config::CAvcDecoderConfigRecord>(
+                   new config::CAvcDecoderConfigRecord(*pavc->m_avcConfigRecord))
+             : nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -518,7 +520,7 @@ CHevcTrackReader::CHevcTrackReader(std::weak_ptr<CIsobmffReader::Pimpl> reader_p
       new CHevcTrackReader::PimplHevc(reader_pimpl, tracknumber));
 
   auto cfgRecordBlob = phevc->m_genericVideoTrackReader.decoderConfigRecord();
-  if (cfgRecordBlob.size() != 0) {
+  if (!cfgRecordBlob.empty()) {
     ilo::ByteBuffer::const_iterator dataBegin = cfgRecordBlob.cbegin();
     phevc->m_hevcConfigRecord = std::unique_ptr<config::CHevcDecoderConfigRecord>(
         new config::CHevcDecoderConfigRecord(dataBegin, cfgRecordBlob.end()));
@@ -531,7 +533,7 @@ SSampleExtraInfo CHevcTrackReader::nextSample(SHevcSample& hevcSample, bool prea
   hevcSample.clear();
   SSampleExtraInfo sExtraInfo =
       phevc->m_genericVideoTrackReader.nextSample(hevcSample.sample, preallocate);
-  if (hevcSample.sample.rawData.size() != 0) {
+  if (phevc->m_hevcConfigRecord && !hevcSample.sample.rawData.empty()) {
     tools::parseVideoSampleNalus(hevcSample, *phevc->m_hevcConfigRecord);
   }
   return sExtraInfo;
@@ -542,7 +544,7 @@ SSampleExtraInfo CHevcTrackReader::sampleByIndex(size_t sampleIndex, SHevcSample
   hevcSample.clear();
   SSampleExtraInfo sExtraInfo =
       phevc->m_genericVideoTrackReader.sampleByIndex(sampleIndex, hevcSample.sample, preallocate);
-  if (hevcSample.sample.rawData.size() != 0) {
+  if (phevc->m_hevcConfigRecord && !hevcSample.sample.rawData.empty()) {
     tools::parseVideoSampleNalus(hevcSample, *phevc->m_hevcConfigRecord);
   }
   return sExtraInfo;
@@ -554,7 +556,7 @@ SSampleExtraInfo CHevcTrackReader::sampleByTimestamp(const SSeekConfig& seekConf
   hevcSample.clear();
   SSampleExtraInfo sExtraInfo = phevc->m_genericVideoTrackReader.sampleByTimestamp(
       seekConfig, hevcSample.sample, preallocate);
-  if (hevcSample.sample.rawData.size() != 0) {
+  if (phevc->m_hevcConfigRecord && !hevcSample.sample.rawData.empty()) {
     tools::parseVideoSampleNalus(hevcSample, *phevc->m_hevcConfigRecord);
   }
   return sExtraInfo;
@@ -586,8 +588,10 @@ uint16_t CHevcTrackReader::depth() const {
 
 std::unique_ptr<config::CHevcDecoderConfigRecord> CHevcTrackReader::hevcDecoderConfigRecord()
     const {
-  return std::unique_ptr<config::CHevcDecoderConfigRecord>(
-      new config::CHevcDecoderConfigRecord(*phevc->m_hevcConfigRecord));
+  return phevc->m_hevcConfigRecord
+             ? std::unique_ptr<config::CHevcDecoderConfigRecord>(
+                   new config::CHevcDecoderConfigRecord(*phevc->m_hevcConfigRecord))
+             : nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -657,7 +661,7 @@ CJxsTrackReader::CJxsTrackReader(std::weak_ptr<CIsobmffReader::Pimpl> reader_pim
   pjxs = ilo::make_unique<CJxsTrackReader::PimplJxs>(reader_pimpl, tracknumber);
 
   auto cfgRecordBlob = pjxs->m_genericVideoTrackReader.decoderConfigRecord();
-  if (cfgRecordBlob.size() != 0) {
+  if (!cfgRecordBlob.empty()) {
     ilo::ByteBuffer::const_iterator dataBegin = cfgRecordBlob.cbegin();
     pjxs->m_jxsConfigRecord =
         ilo::make_unique<config::CJxsDecoderConfigRecord>(dataBegin, cfgRecordBlob.end());
@@ -709,8 +713,10 @@ SJpegxsExtraData CJxsTrackReader::jpegxsExtraData() const {
 }
 
 std::unique_ptr<config::CJxsDecoderConfigRecord> CJxsTrackReader::jxsDecoderConfigRecord() const {
-  return std::unique_ptr<config::CJxsDecoderConfigRecord>(
-      new config::CJxsDecoderConfigRecord(*pjxs->m_jxsConfigRecord));
+  return pjxs->m_jxsConfigRecord
+             ? std::unique_ptr<config::CJxsDecoderConfigRecord>(
+                   new config::CJxsDecoderConfigRecord(*pjxs->m_jxsConfigRecord))
+             : nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -741,7 +747,7 @@ SSampleExtraInfo CVvcTrackReader::nextSample(SVvcSample& vvcSample, bool preallo
   vvcSample.clear();
   SSampleExtraInfo sExtraInfo =
       pvvc->m_genericVideoTrackReader.nextSample(vvcSample.sample, preallocate);
-  if (vvcSample.sample.rawData.size() != 0) {
+  if (pvvc->m_vvcConfigRecord && !vvcSample.sample.rawData.empty()) {
     tools::parseVideoSampleNalus(vvcSample, *pvvc->m_vvcConfigRecord);
   }
   return sExtraInfo;
@@ -752,7 +758,7 @@ SSampleExtraInfo CVvcTrackReader::sampleByIndex(size_t sampleIndex, SVvcSample& 
   vvcSample.clear();
   SSampleExtraInfo sExtraInfo =
       pvvc->m_genericVideoTrackReader.sampleByIndex(sampleIndex, vvcSample.sample, preallocate);
-  if (vvcSample.sample.rawData.size() != 0) {
+  if (pvvc->m_vvcConfigRecord && !vvcSample.sample.rawData.empty()) {
     tools::parseVideoSampleNalus(vvcSample, *pvvc->m_vvcConfigRecord);
   }
   return sExtraInfo;
@@ -763,7 +769,7 @@ SSampleExtraInfo CVvcTrackReader::sampleByTimestamp(const SSeekConfig& seekConfi
   vvcSample.clear();
   SSampleExtraInfo sExtraInfo =
       pvvc->m_genericVideoTrackReader.sampleByTimestamp(seekConfig, vvcSample.sample, preallocate);
-  if (vvcSample.sample.rawData.size() != 0) {
+  if (pvvc->m_vvcConfigRecord && !vvcSample.sample.rawData.empty()) {
     tools::parseVideoSampleNalus(vvcSample, *pvvc->m_vvcConfigRecord);
   }
   return sExtraInfo;
@@ -794,7 +800,9 @@ uint16_t CVvcTrackReader::depth() const {
 }
 
 std::unique_ptr<config::CVvcDecoderConfigRecord> CVvcTrackReader::vvcDecoderConfigRecord() const {
-  return ilo::make_unique<config::CVvcDecoderConfigRecord>(*pvvc->m_vvcConfigRecord);
+  return pvvc->m_vvcConfigRecord
+             ? ilo::make_unique<config::CVvcDecoderConfigRecord>(*pvvc->m_vvcConfigRecord)
+             : nullptr;
 }
 }  // namespace isobmff
 }  // namespace mmt

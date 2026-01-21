@@ -322,6 +322,8 @@ void CHevcDecoderConfigRecord::parse(ilo::ByteBuffer::const_iterator& begin,
     for (uint32_t j = 0; j < numNalus; j++) {
       uint16_t naluLength = readUint16(begin, end);
 
+      ILO_ASSERT(begin + naluLength <= end,
+                 "HEVC Decoder Configuration Record: Nalu length exceeds input buffer!");
       hevcArray.nalus.push_back(ByteBuffer(begin, begin + naluLength));
 
       begin += naluLength;
