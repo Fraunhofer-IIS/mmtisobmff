@@ -102,7 +102,7 @@ namespace limits {
  * Reasoning: Since the udta box should not contain any media sample data, it should never become
  * that large.
  */
-static constexpr std::size_t MAX_USER_DATA_SIZE = 1024 * 1024 * 1024;  // 1GB
+static const std::size_t MAX_USER_DATA_SIZE = 1024 * 1024 * 1024;  // 1GB
 
 /*!
  * The maximum allowed size of a single sample buffer.
@@ -110,7 +110,7 @@ static constexpr std::size_t MAX_USER_DATA_SIZE = 1024 * 1024 * 1024;  // 1GB
  * Reasoning: The value was chosen to be big enough to work in 99,999% of all cases and still
  * prevent a decent out-of-memory error protection.
  */
-static constexpr std::size_t MAX_SAMPLE_SIZE = 200 * 1024 * 1024;  // 200MB
+static const std::size_t MAX_SAMPLE_SIZE = 200 * 1024 * 1024;  // 200MB
 
 /*!
  * The maximum allowed number of samples in a single track (per fragment).
@@ -119,12 +119,12 @@ static constexpr std::size_t MAX_SAMPLE_SIZE = 200 * 1024 * 1024;  // 200MB
  * - 200h of 60 FPS video or
  * - 250h of 48kHz audio (at 1024 ticks per samples).
  */
-static constexpr uint32_t MAX_NUM_SAMPLES = 44000000;
+static const uint32_t MAX_NUM_SAMPLES = 44000000;
 
 /*!
  * The maximum number of entries is a trun box.
  */
-static constexpr uint32_t MAX_TRUN_ENTRIES = 1000000;
+static const uint32_t MAX_TRUN_ENTRIES = 1000000;
 
 }  // namespace limits
 }  // namespace isobmff
