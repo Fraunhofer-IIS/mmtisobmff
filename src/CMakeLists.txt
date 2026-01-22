@@ -146,6 +146,7 @@ set(srcTools
     common/bytebuffertools_extension.h
     common/bytebuffertools_extension.cpp
     common/internal_types.h
+    common/restrictions.h
     service/boxreader.h
     service/boxreader.cpp
     service/factory.h

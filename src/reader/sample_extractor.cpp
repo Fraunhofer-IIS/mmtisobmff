@@ -86,6 +86,7 @@ amm-info@iis.fraunhofer.de
  */
 
 #include "reader/sample_extractor.h"
+#include "common/restrictions.h"
 
 #include "box/sttsbox.h"
 #include "box/stszbox.h"
@@ -100,10 +101,6 @@ amm-info@iis.fraunhofer.de
 
 namespace mmt {
 namespace isobmff {
-// This constant is meant to mitigate erroneous big sample buffer allocation with defective MP4
-// files. The value was chosen to be big enough to work in 99,999% of all cases and still prevent a
-// decent out-of-memory error protection.
-const uint32_t MAX_ALLOWED_SAMPLES_SIZE_IN_BYTE = 200000000;
 
 void ISampleExtractor::fillDefaultSampleGroupInfo(SampleToSampleGroupInfoMap& infoMap,
                                                   const SDefaultConfig& config) const {
@@ -352,9 +349,9 @@ void CFragmentedSampleExtractor::setSampleSize(const box::CTrunEntry& trunEntry,
     ILO_LOG_ERROR("Sample with size zero found");
   }
 
-  ILO_ASSERT_WITH(metaSample.size <= MAX_ALLOWED_SAMPLES_SIZE_IN_BYTE, std::length_error,
-                  "Sample size of %" PRId64 " found that exceeds maximum allow size of %d",
-                  metaSample.size, MAX_ALLOWED_SAMPLES_SIZE_IN_BYTE);
+  ILO_ASSERT_WITH(metaSample.size <= limits::MAX_SAMPLE_SIZE, std::length_error,
+                  "Sample size of %zu found that exceeds maximum allowed size of %zu",
+                  metaSample.size, limits::MAX_SAMPLE_SIZE);
 }
 
 void CFragmentedSampleExtractor::setSampleDuration(const box::CTrunEntry& trunEntry,
@@ -484,6 +481,10 @@ void CRegularSampleExtractor::setSampleSizes(const uint32_t& trackId, const BoxE
   auto sizeEntriesStszSize = sizeEntriesStsz.size();
   auto sizeEntriesStz2Size = sizeEntriesStz2.size();
 
+  ILO_ASSERT_WITH(m_sampleCount <= limits::MAX_NUM_SAMPLES, std::length_error,
+                  "Number of samples of %u exceed the limit of %u", m_sampleCount,
+                  limits::MAX_NUM_SAMPLES);
+
   auto& currentSampleInfos = (*m_sampleInfoTable)[trackId];
   currentSampleInfos.resize(m_sampleCount);
 
@@ -496,10 +497,9 @@ void CRegularSampleExtractor::setSampleSizes(const uint32_t& trackId, const BoxE
       currentSampleInfos[i].size = sizeEntriesStz2[i];
     }
 
-    ILO_ASSERT_WITH(currentSampleInfos[i].size <= MAX_ALLOWED_SAMPLES_SIZE_IN_BYTE,
-                    std::length_error,
-                    "Sample size of %" PRId64 " found that exceeds maximum allow size of %d",
-                    currentSampleInfos[i].size, MAX_ALLOWED_SAMPLES_SIZE_IN_BYTE);
+    ILO_ASSERT_WITH(currentSampleInfos[i].size <= limits::MAX_SAMPLE_SIZE, std::length_error,
+                    "Sample size of %zu found that exceeds maximum allowed size of %zu",
+                    currentSampleInfos[i].size, limits::MAX_SAMPLE_SIZE);
   }
 }
 

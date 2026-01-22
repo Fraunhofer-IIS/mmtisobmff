@@ -95,6 +95,7 @@ amm-info@iis.fraunhofer.de
 // Internal headers
 #include "trunbox.h"
 #include "common/logging.h"
+#include "common/restrictions.h"
 
 namespace mmt {
 namespace isobmff {
@@ -229,6 +230,14 @@ void CTrackRunBox::parseBox(ilo::ByteBuffer::const_iterator& begin,
     m_firstSampleFlags = ilo::readUint32(begin, end);
   }
 
+  // If the sampleCount is huge, but none of the flags are set, this could add a large amount of
+  // entries without actually reading any bytes, possibly causing OOM.
+  // As a sanity-check, error out in this case
+  ILO_ASSERT_WITH(m_sampleCount < limits::MAX_TRUN_ENTRIES, std::length_error,
+                  "The number of trun %u entries exceeds the sane limit of %u", m_sampleCount,
+                  limits::MAX_TRUN_ENTRIES);
+
+  m_trunEntries.reserve(m_sampleCount);
   for (uint32_t i = 0; i < m_sampleCount; ++i) {
     CTrunEntry trunEntry;
 

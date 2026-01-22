@@ -88,10 +88,12 @@ amm-info@iis.fraunhofer.de
 #pragma once
 
 #include <map>
+#include <stdexcept>
 #include <type_traits>
 
 #include "mmtisobmff/reader/reader.h"
 #include "tree/boxtree.h"
+#include "common/restrictions.h"
 
 #include "box/elstbox.h"
 #include "box/mdhdbox.h"
@@ -155,14 +157,12 @@ struct CEditListExtractor {
 struct CUserDataExtractor {
   template <class T>
   static void store(const BoxElement& t, T& ti) {
-    auto isTrackInfo = std::is_same<T, CTrackInfo>::value;
-    auto isMovieInfo = std::is_same<T, CMovieInfo>::value;
-
-    ILO_ASSERT(isMovieInfo || isTrackInfo, "user data can only be in movie info or track info");
+    static_assert(std::is_same<T, CTrackInfo>::value || std::is_same<T, CMovieInfo>::value,
+                  "User data can only be in movie info or track info");
 
     auto udtaElements =
         findAllElementsWithFourccAndBoxType<box::CContainerBox>(t, ilo::toFcc("udta"), 1);
-    if (udtaElements.size() == 0) {
+    if (udtaElements.empty()) {
       return;
     }
 
@@ -173,10 +173,13 @@ struct CUserDataExtractor {
     for (size_t nodeNr = 0; nodeNr < udataTree.childCount(); ++nodeNr) {
       const auto& currentNode = udataTree[nodeNr];
       auto size = currentNode.item->size();
+      ILO_ASSERT_WITH(size <= limits::MAX_USER_DATA_SIZE, std::length_error,
+                      "User data size exceeds the sane limit of %zu Bytes",
+                      limits::MAX_USER_DATA_SIZE);
       ilo::ByteBuffer data(static_cast<size_t>(size));
       ilo::ByteBuffer::iterator dataIter = data.begin();
       serializeTree(currentNode, data, dataIter);
-      ti.userData.push_back(data);
+      ti.userData.push_back(std::move(data));
     }
   }
 };
