@@ -350,7 +350,8 @@ void CFragmentedSampleExtractor::setSampleSize(const box::CTrunEntry& trunEntry,
   }
 
   ILO_ASSERT_WITH(metaSample.size <= limits::MAX_SAMPLE_SIZE, std::length_error,
-                  "Sample size of %zu found that exceeds maximum allowed size of %zu",
+                  "Sample size of %zu found that exceeds maximum allowed size of %zu, the file is "
+                  "likely corrupted",
                   metaSample.size, limits::MAX_SAMPLE_SIZE);
 }
 

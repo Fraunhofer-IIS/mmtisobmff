@@ -108,7 +108,7 @@ static const std::size_t MAX_USER_DATA_SIZE = 1024 * 1024 * 1024;  // 1GB
  * The maximum allowed size of a single sample buffer.
  *
  * Reasoning: The value was chosen to be big enough to work in 99,999% of all cases and still
- * prevent a decent out-of-memory error protection.
+ * provide a decent out-of-memory error protection.
  */
 static const std::size_t MAX_SAMPLE_SIZE = 200 * 1024 * 1024;  // 200MB
 
@@ -122,7 +122,7 @@ static const std::size_t MAX_SAMPLE_SIZE = 200 * 1024 * 1024;  // 200MB
 static const uint32_t MAX_NUM_SAMPLES = 44000000;
 
 /*!
- * The maximum number of entries is a trun box.
+ * The maximum number of entries in a trun box.
  */
 static const uint32_t MAX_TRUN_ENTRIES = 1000000;
 
