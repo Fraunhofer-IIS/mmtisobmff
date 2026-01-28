@@ -88,6 +88,7 @@ amm-info@iis.fraunhofer.de
 #pragma once
 
 #include <map>
+#include <numeric>
 #include <stdexcept>
 #include <type_traits>
 
@@ -170,12 +171,19 @@ struct CUserDataExtractor {
                "Multiple udta containers on the same level are forbidden");
 
     const auto& udataTree = udtaElements[0].get();
+    uint64_t totalSize = 0;
+    for (size_t nodeNr = 0; nodeNr < udataTree.childCount(); ++nodeNr) {
+      const auto& currentNode = udataTree[nodeNr];
+      totalSize += currentNode.item->size();
+    }
+    ILO_ASSERT_WITH(udataTree.item->size() <= limits::MAX_USER_DATA_SIZE &&
+                        totalSize <= static_cast<uint64_t>(limits::MAX_USER_DATA_SIZE),
+                    std::length_error, "User data size exceeds the sane limit of %zu Bytes",
+                    limits::MAX_USER_DATA_SIZE);
+
     for (size_t nodeNr = 0; nodeNr < udataTree.childCount(); ++nodeNr) {
       const auto& currentNode = udataTree[nodeNr];
       auto size = currentNode.item->size();
-      ILO_ASSERT_WITH(size <= limits::MAX_USER_DATA_SIZE, std::length_error,
-                      "User data size exceeds the sane limit of %zu Bytes",
-                      limits::MAX_USER_DATA_SIZE);
       ilo::ByteBuffer data(static_cast<size_t>(size));
       ilo::ByteBuffer::iterator dataIter = data.begin();
       serializeTree(currentNode, data, dataIter);
