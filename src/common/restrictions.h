@@ -116,10 +116,10 @@ static const std::size_t MAX_SAMPLE_SIZE = 200 * 1024 * 1024;  // 200MB
  * The maximum allowed number of samples in a single track (per fragment).
  *
  * Reasoning: The chosen value allows for more than:
- * - 200h of 60 FPS video or
- * - 250h of 48kHz audio (at 1024 ticks per samples).
+ * - 400h of 60 FPS video or
+ * - 500h of 48kHz audio (at 1024 ticks per samples).
  */
-static const uint32_t MAX_NUM_SAMPLES = 44000000;
+static const uint32_t MAX_NUM_SAMPLES = 87000000;
 
 /*!
  * The maximum number of entries in a trun box.
