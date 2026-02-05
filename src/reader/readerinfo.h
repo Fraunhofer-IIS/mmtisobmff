@@ -197,8 +197,20 @@ struct CMediaTimeInfoExtractor {
     auto mdhd = findFirstBoxWithPathAndType<box::CMediaHeaderBox>(t, "mdia/mdhd");
     ILO_ASSERT(mdhd.get() != nullptr, "mdhd not found");
     ti.timescale = mdhd->timescale();
-    ti.duration = mdhd->duration();
     ti.language = mdhd->language();
+
+    switch (mdhd->version()) {
+      case 0:
+        ti.duration =
+            (mdhd->duration() == std::numeric_limits<uint32_t>::max()) ? 0 : mdhd->duration();
+        break;
+      case 1:
+        ti.duration =
+            (mdhd->duration() == std::numeric_limits<uint64_t>::max()) ? 0 : mdhd->duration();
+        break;
+      default:
+        ILO_FAIL("Unsupported mdhd box version");
+    }
   }
 };
 
