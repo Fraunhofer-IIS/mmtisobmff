@@ -156,7 +156,7 @@ struct SMovieConfig {
    * @brief Optional value, create and set the userData to enable user data writing on movie level
    * (default is none)
    *
-   * Each call of this function will generate a child box in the 'udta' container box in 'moov'.
+   * Each entry in this vector will generate a child box in the 'udta' container box in 'moov'.
    * The structure of the user data buffer is defined in ISO/IEC 14496-12, Clause 4.2 and looks
    * likes this:
    * @code
