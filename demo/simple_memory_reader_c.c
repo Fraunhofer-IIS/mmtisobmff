@@ -218,25 +218,25 @@ void prettyPrintFourCC(const char* fourCC, uint32_t size) {
 
 ISOBMFF_ERR printDscInfo(TrackReader* track) {
   ISOBMFF_ERR err = ISOBMFF_OK;
-  uint8_t* dcrData = NULL;
-  uint32_t dcrDataSize = 0;
+  uint8_t* dscData = NULL;
+  uint32_t dscDataSize = 0;
   uint32_t i = 0;
 
   printf("Dsc Info: \n");
   printf("########################################\n");
 
-  err = isobmff_getDecoderSpecificConfig(track, &dcrData, &dcrDataSize);
+  err = isobmff_getDecoderSpecificConfig(track, &dscData, &dscDataSize);
   if (err) {
     printf("Error: Failed to get decoder specific config.\n");
     return err;
   }
 
   printf("Decoder Specific Config available?: ");
-  if (dcrDataSize > 0) {
+  if (dscDataSize > 0) {
     printf("Yes\n");
     printf("Dsc data: ");
-    for (i = 0; i < dcrDataSize; i++) {
-      printf("%02x ", dcrData[i]);
+    for (i = 0; i < dscDataSize; i++) {
+      printf("%02x ", dscData[i]);
     }
     printf("\n");
   } else {
@@ -372,10 +372,10 @@ int main(int argc, char* argv[]) {
 
     printf("Done.\n\n");
 
-    /* Get decoder config record data */
+    /* Get and print decoder specific config data */
     err = printDscInfo(track);
     if (err) {
-      printf("Error: Failed to print decoder config record data.\n");
+      printf("Error: Failed to print decoder specific config data.\n");
       goto error;
     }
 
