@@ -1,0 +1,5 @@
+[unsigned-integer-overflow]
+# UBSAN reports unsigned integer overflow inside the libstdc++ in some string comparison functions,
+# which we cannot do anything about and is actually not an error, since unsigned "overflow" is well defined.
+fun:*string*compare*
+src:*bits/basic_string.h
